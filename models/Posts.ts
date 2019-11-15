@@ -31,6 +31,9 @@ Posts.init(
     },
     location_id: {
       type: new DataTypes.NUMBER()
+    },
+    pay: {
+      type: new DataTypes.TINYINT()
     }
   },
   {

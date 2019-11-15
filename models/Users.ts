@@ -51,6 +51,9 @@ Posts.init(
     },
     pay_id: {
       type: new DataTypes.STRING()
+    },
+    oAuth: {
+      type: new DataTypes.TINYINT()
     }
   },
   {
