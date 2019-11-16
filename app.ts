@@ -1,19 +1,20 @@
 import express from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
+import { PostsRoutes } from "./routes/Post";
 
 class App {
   public app: express.Application;
+  public routeToPosts: PostsRoutes = new PostsRoutes();
 
   constructor() {
     this.app = express();
     this.config();
+    this.routeToPosts.routes(this.app);
   }
 
   private config(): void {
-    // support application/json type post data
     this.app.use(bodyParser.json());
-    //support application/x-www-form-urlencoded post data
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
   }
