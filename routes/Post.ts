@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
+import { PostsController } from "../controller/Post";
 
 export class PostsRoutes {
-  public routes(app): void {
+  public postsController: PostsController = new PostsController();
+  public routes(app: any): void {
     //모임 생성
-    app.route("/posts").post((req: Request, res: Response) => {});
+    app.route("/posts").post(this.postsController.create);
 
     //전체 모음목록 데이터 get
-    app.route("/posts").get((req: Request, res: Response) => {});
+    app.route("/posts").get(this.postsController.index);
 
     //유저 모임목록 데이터 get
     app.route("/posts/:user_id").get((req: Request, res: Response) => {});

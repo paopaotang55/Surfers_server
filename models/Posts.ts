@@ -3,6 +3,7 @@ import { database } from "../database/database";
 
 export class Posts extends Model {
   public id!: number;
+
   public host_id!: number;
   public text!: string;
   public date!: string;
@@ -43,3 +44,11 @@ Posts.init(
 );
 
 Posts.sync({ force: true }).then(() => console.log("Posts table created"));
+
+export interface PostsInterface {
+  host_id: number;
+  text: string;
+  date: string;
+  location_id: number;
+  pay: boolean;
+}
