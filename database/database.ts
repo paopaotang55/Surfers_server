@@ -1,9 +1,7 @@
 import { Sequelize } from "sequelize";
 
-export const database = new Sequelize({
-  host: `127.0.0.1`,
-  password: "",
-  database: "chiMe",
+export const database = new Sequelize("chiMe", "root", "", {
+  host: `localhost`,
   dialect: "mariadb",
   dialectOptions: {
     useUTC: false

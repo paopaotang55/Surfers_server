@@ -22,7 +22,7 @@ Posts.init(
       primaryKey: true
     },
     host_id: {
-      type: new DataTypes.NUMBER()
+      type: new DataTypes.INTEGER()
     },
     text: {
       type: new DataTypes.STRING()
@@ -31,7 +31,7 @@ Posts.init(
       type: new DataTypes.STRING()
     },
     location_id: {
-      type: new DataTypes.NUMBER()
+      type: new DataTypes.INTEGER()
     },
     pay: {
       type: new DataTypes.TINYINT()
