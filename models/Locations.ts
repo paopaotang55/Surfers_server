@@ -29,3 +29,7 @@ Locations.init(
 Locations.sync({ force: true }).then(() =>
   console.log("Locations table created")
 );
+
+export interface LocationsInterface {
+  name: string;
+}
