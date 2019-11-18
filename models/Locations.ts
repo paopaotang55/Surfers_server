@@ -1,5 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions } from "sequelize";
 import { database } from "../database/database";
+import { Posts } from "./Posts";
 
 export class Locations extends Model {
   public id!: number;
@@ -14,7 +15,8 @@ Locations.init(
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
+      allowNull: false
     },
     name: {
       type: new DataTypes.STRING()
@@ -26,9 +28,7 @@ Locations.init(
   }
 );
 
-Locations.sync({ force: true }).then(() =>
-  console.log("Locations table created")
-);
+Locations.sync().then(() => console.log("Locations table created"));
 
 export interface LocationsInterface {
   name: string;

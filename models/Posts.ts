@@ -1,5 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions } from "sequelize";
 import { database } from "../database/database";
+import { Locations } from "./Locations";
 
 export class Posts extends Model {
   public id!: number;
@@ -31,7 +32,8 @@ Posts.init(
       type: new DataTypes.STRING()
     },
     location_id: {
-      type: new DataTypes.INTEGER()
+      type: new DataTypes.INTEGER(),
+      allowNull: false
     },
     pay: {
       type: new DataTypes.TINYINT()
@@ -43,7 +45,13 @@ Posts.init(
   }
 );
 
-Posts.sync({ force: true }).then(() => console.log("Posts table created"));
+Posts.belongsTo(Locations, {
+  foreignKey: "location_id",
+  targetKey: "id",
+  as: "location_name"
+});
+
+Posts.sync().then(() => console.log("Posts table created"));
 
 export interface PostsInterface {
   host_id: number;
