@@ -2,9 +2,16 @@ import { Request, Response } from "express";
 import { Posts, PostsInterface } from "../models/Posts";
 import { Locations, LocationsInterface } from "../models/Locations";
 
+Posts.belongsTo(Locations, {
+  foreignKey: "location_id",
+  targetKey: "id"
+});
+
 export class PostsController {
   public index(req: Request, res: Response) {
-    Posts.findAll<Posts>({})
+    Posts.findAll<Posts>({
+      include: [{ model: Locations, attributes: ["name"] }]
+    })
       .then((datas: Array<Posts>) => res.json(datas))
       .catch((err: Error) =>
         res.status(500).json({ message: "목록 불러오기 실패" })
@@ -13,7 +20,6 @@ export class PostsController {
 
   public create(req: Request, res: Response) {
     const params: PostsInterface = req.body;
-
     Posts.create<Posts>(params).then((datas: Posts) => {
       res.status(201).json(datas); // redirect("/room")문제있음. 프런트와 이야기 해야 함.
     });

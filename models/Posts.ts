@@ -45,12 +45,6 @@ Posts.init(
   }
 );
 
-Posts.belongsTo(Locations, {
-  foreignKey: "location_id",
-  targetKey: "id",
-  as: "location_name"
-});
-
 Posts.sync().then(() => console.log("Posts table created"));
 
 export interface PostsInterface {

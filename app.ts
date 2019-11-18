@@ -6,13 +6,13 @@ import { DefaultRoutes } from "./routes/Default";
 
 class App {
   public app: express.Application;
-  public connecToServer: DefaultRoutes = new DefaultRoutes();
+  public connectToServer: DefaultRoutes = new DefaultRoutes();
   public routeToPosts: PostsRoutes = new PostsRoutes();
 
   constructor() {
     this.app = express();
     this.config();
-    this.connecToServer.routes(this.app);
+    this.connectToServer.routes(this.app);
     this.routeToPosts.routes(this.app);
   }
 
