@@ -4,18 +4,18 @@ import { PostsController } from "../controller/Post";
 export class PostsRoutes {
   public postsController: PostsController = new PostsController();
   public routes(app: any): void {
-    //모임 생성
-    app.route("/posts").post(this.postsController.create);
+    //모임 생성 혹은 쿼리에 따라 내 리스트에 추가
+    app.route("/posts").post(this.postsController.makeRoomOrAddMyList);
 
     //전체 모음목록 데이터 get
-    app.route("/posts").get(this.postsController.index);
+    app.route("/posts").get(this.postsController.getRoomList);
 
     //유저 모임목록 데이터 get
-    app.route("/posts/:user_id").get((req: Request, res: Response) => {});
+    app.route("/posts/:user_id").get(this.postsController.getMyList);
 
-    //유저 모임 나가기 이건 아직 미정. 프런트분들과 이야기
+    //유저 모임 나가기
     app
-      .route("/posts/:user_id/:post_id")
-      .delete((req: Request, res: Response) => {});
+      .route("/posts") //example = /posts?user_id=15&room_id=20
+      .delete(this.postsController.deleteFromList);
   }
 }

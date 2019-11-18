@@ -6,3 +6,4 @@ node_modules
 ## json.files##
 package-lock.json
 config
+js

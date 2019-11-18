@@ -13,6 +13,8 @@ export class Posts extends Model {
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  // public location_name?: string;
 }
 
 Posts.init(

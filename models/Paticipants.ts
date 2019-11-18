@@ -18,10 +18,12 @@ Participants.init(
       primaryKey: true
     },
     user_id: {
-      type: new DataTypes.NUMBER()
+      type: new DataTypes.INTEGER(),
+      allowNull: false
     },
     post_id: {
-      type: new DataTypes.NUMBER()
+      type: new DataTypes.INTEGER(),
+      allowNull: false
     }
   },
   {
@@ -30,6 +32,9 @@ Participants.init(
   }
 );
 
-Participants.sync({ force: true }).then(() =>
-  console.log("Participants table created")
-);
+Participants.sync().then(() => console.log("Participants table created"));
+
+export interface ParticipantsInterface {
+  user_id: number;
+  post_id: number;
+}
