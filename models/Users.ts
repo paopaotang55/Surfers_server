@@ -5,7 +5,7 @@ export class Posts extends Model {
   public id!: number;
   public name?: string;
   public email!: string;
-  public password!: string;
+  public password?: string;
   public image?: Blob;
   public img_url?: string;
   public oAuth!: boolean;

@@ -1,6 +1,7 @@
 import express from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
+
 import { PostsRoutes } from "./routes/Post";
 import { DefaultRoutes } from "./routes/Default";
 
