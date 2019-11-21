@@ -19,11 +19,11 @@ Chats.init(
       primaryKey: true
     },
     user_id: {
-      type: new DataTypes.NUMBER(),
+      type: new DataTypes.INTEGER(),
       allowNull: true
     },
     post_id: {
-      type: new DataTypes.NUMBER(),
+      type: new DataTypes.INTEGER(),
       allowNull: true
     },
     text: {
@@ -37,3 +37,5 @@ Chats.init(
 );
 
 Chats.sync({ force: true }).then(() => console.log("Chats table created"));
+
+export interface ChatInterface {}

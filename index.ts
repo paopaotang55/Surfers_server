@@ -1,8 +1,17 @@
-import app from "./app";
+import server from "./app";
+import * as SocketIO from "socket.io";
 
 const Port = 3000;
 
-app.listen(Port, err => {
+server.io.on("connection", (socket: any) => {
+  console.log("connected");
+
+  socket.on("chatEvent", (message: any) => {
+    console.log("you got message");
+  });
+});
+
+server.http.listen(Port, (err: Error) => {
   if (err) {
     console.log(`Can't listen on Port ${Port}`);
     console.log(`Error message is: ${err}`);
