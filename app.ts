@@ -13,19 +13,20 @@ class App {
   public routeToChats: ChatRoutes = new ChatRoutes();
   public http: any;
   public io: any;
+  public test: any;
 
   constructor() {
     this.app = express().bind(this);
 
     this.http = require("http").Server(this.app);
-
+    //업그레이드
     this.io = require("socket.io")(this.http);
 
     this.io.on("connection", (socket: any) => {
       console.log("connected");
 
       socket.on("chatEvent", (message: any) => {
-        console.log("you got message");
+        console.log(message);
       });
     });
 

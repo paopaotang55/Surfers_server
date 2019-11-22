@@ -1,15 +1,6 @@
 import server from "./app";
-import * as SocketIO from "socket.io";
 
 const Port = 3000;
-
-server.io.on("connection", (socket: any) => {
-  console.log("connected");
-
-  socket.on("chatEvent", (message: any) => {
-    console.log("you got message");
-  });
-});
 
 server.http.listen(Port, (err: Error) => {
   if (err) {
