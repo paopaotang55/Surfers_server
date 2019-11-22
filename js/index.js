@@ -5,12 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const Port = 3000;
-app_1.default.io.on("connection", (socket) => {
-    console.log("connected");
-    socket.on("chatEvent", (message) => {
-        console.log("you got message");
-    });
-});
 app_1.default.http.listen(Port, (err) => {
     if (err) {
         console.log(`Can't listen on Port ${Port}`);

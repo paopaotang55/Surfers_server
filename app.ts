@@ -1,4 +1,5 @@
 import express from "express";
+import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
 
@@ -25,8 +26,10 @@ class App {
     this.io.on("connection", (socket: any) => {
       console.log("connected");
 
-      socket.on("chatEvent", (message: any) => {
-        console.log(message);
+      socket.on("chatEvent", (room: string) => {
+        socket.join(room);
+        console.log(`${room} room created`);
+        console.log("socket rooms: ", Object.keys(socket.rooms));
       });
     });
 

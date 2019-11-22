@@ -23,11 +23,14 @@ class App {
         this.routeToChats = new Chat_1.ChatRoutes();
         this.app = express_1.default().bind(this);
         this.http = require("http").Server(this.app);
+        //업그레이드
         this.io = require("socket.io")(this.http);
         this.io.on("connection", (socket) => {
             console.log("connected");
-            socket.on("chatEvent", (message) => {
-                console.log("you got message");
+            socket.on("chatEvent", (room) => {
+                socket.join(room);
+                console.log(`${room} room created`);
+                console.log("socket rooms: ", Object.keys(socket.rooms));
             });
         });
         this.config();

@@ -38,4 +38,8 @@ Chats.init(
 
 Chats.sync({ force: true }).then(() => console.log("Chats table created"));
 
-export interface ChatInterface {}
+export interface ChatsInterface {
+  user_id: number;
+  post_id: number;
+  text: string;
+}
