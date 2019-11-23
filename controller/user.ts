@@ -139,7 +139,7 @@ export class User {
                 }
             })
         }
-        let email: string = req.body.email;  // api 
+        let email: string = req.body.email.email;  // api 
         let name1: string = req.body.name;
         let password1: string = req.body.password;
         let image1: Blob = req.body.image;
@@ -201,7 +201,8 @@ export class User {
             let token1: string = bearerToken.split(' ')[1];
             console.log(token1)
             if (tokenVerify(token1)) {
-                console.log(tokenVerify(token1))
+                req.body.email = jwt.verify(token1, config.secret)
+                console.log(req)
                 next();
             } else {
                 return res.send("무효한 token 입니다")
