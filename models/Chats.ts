@@ -26,10 +26,6 @@ Chats.init(
       type: new DataTypes.INTEGER(),
       allowNull: true
     },
-    post_id: {
-      type: new DataTypes.INTEGER(),
-      allowNull: false
-    },
     text: {
       type: new DataTypes.STRING()
     }
@@ -39,7 +35,6 @@ Chats.init(
     sequelize: database
   }
 );
-
 
 Chats.sync({ force: true }).then(() => console.log("Chats table created"));
 
