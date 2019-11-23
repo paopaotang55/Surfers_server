@@ -1,15 +1,15 @@
-import { Sequelize, Model, DataTypes, BuildOptions } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { database } from "../database/database";
 
-export class Posts extends Model {
+export class Users extends Model {
   public id!: number;
-  public name?: string;
+  public name!: string;
   public email!: string;
   public password?: string;
   public image?: Blob;
   public img_url?: string;
-  public oAuth!: boolean;
-  public point!: number;
+  public oAuth!: number;
+  public point?: number;
   public phone?: string;
   public level?: string;
   public pay_id?: string;
@@ -18,7 +18,7 @@ export class Posts extends Model {
   public readonly updatedAt!: Date;
 }
 
-Posts.init(
+Users.init(
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -26,10 +26,14 @@ Posts.init(
       primaryKey: true
     },
     name: {
-      type: new DataTypes.STRING()
+      type: new DataTypes.STRING(50),
+      allowNull: false,
+      unique: true
     },
     email: {
-      type: new DataTypes.STRING()
+      type: new DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
     },
     password: {
       type: new DataTypes.STRING()
@@ -41,7 +45,7 @@ Posts.init(
       type: new DataTypes.STRING()
     },
     point: {
-      type: new DataTypes.NUMBER()
+      type: new DataTypes.INTEGER(),
     },
     phone: {
       type: new DataTypes.STRING()
@@ -53,13 +57,15 @@ Posts.init(
       type: new DataTypes.STRING()
     },
     oAuth: {
-      type: new DataTypes.TINYINT()
+      type: new DataTypes.INTEGER(),
+      allowNull: false,
     }
   },
   {
-    tableName: "Posts",
+    tableName: "Users",
     sequelize: database
   }
 );
 
-Posts.sync({ force: true }).then(() => console.log("Posts table created"));
+Users.sync().then(() => console.log("Users table created"));
+

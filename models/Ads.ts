@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes, BuildOptions } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { database } from "../database/database";
 
 export class Ads extends Model {
@@ -19,10 +19,10 @@ Ads.init(
     },
     image: {
       type: new DataTypes.BLOB(),
-      allowNull: true
     },
     url: {
-      type: new DataTypes.STRING()
+      type: new DataTypes.STRING(),
+      allowNull: false,
     }
   },
   {
@@ -31,4 +31,4 @@ Ads.init(
   }
 );
 
-Ads.sync({ force: true }).then(() => console.log("Ads table created"));
+Ads.sync().then(() => console.log("Ads table created"));

@@ -1,6 +1,5 @@
-import { Sequelize, Model, DataTypes, BuildOptions } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { database } from "../database/database";
-import { Locations } from "./Locations";
 
 export class Posts extends Model {
   public id!: number;
@@ -25,13 +24,16 @@ Posts.init(
       primaryKey: true
     },
     host_id: {
-      type: new DataTypes.INTEGER()
+      type: new DataTypes.INTEGER(),
+      allowNull: false
     },
     text: {
-      type: new DataTypes.STRING()
+      type: new DataTypes.STRING(),
+      allowNull: false
     },
     date: {
-      type: new DataTypes.STRING()
+      type: new DataTypes.STRING(),
+      allowNull: false
     },
     location_id: {
       type: new DataTypes.INTEGER(),
@@ -54,5 +56,5 @@ export interface PostsInterface {
   text: string;
   date: string;
   location_id: number;
-  pay: boolean;
+  pay?: boolean;
 }
