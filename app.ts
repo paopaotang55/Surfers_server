@@ -6,6 +6,7 @@ import cors from "cors";
 import { PostsRoutes } from "./routes/Post";
 import { DefaultRoutes } from "./routes/Default";
 import { ChatRoutes } from "./routes/Chat";
+import { hostname } from "os";
 
 class App {
   public app: express.Application;
@@ -15,6 +16,7 @@ class App {
   public http: any;
   public io: any;
   public test: any;
+  public chats: any;
 
   constructor() {
     this.app = express().bind(this);
@@ -22,14 +24,23 @@ class App {
     this.http = require("http").Server(this.app);
     //업그레이드
     this.io = require("socket.io")(this.http);
+    this.chats = this.io.of("/chats");
 
-    this.io.on("connection", (socket: any) => {
+    this.chats.on("connection", (socket: any) => {
       console.log("connected");
 
-      socket.on("chatEvent", (room: string) => {
+      socket.on("joinRoom", (room: string) => {
         socket.join(room);
         console.log(`${room} room created`);
         console.log("socket rooms: ", Object.keys(socket.rooms));
+      });
+
+      socket.on("message", (data: any) => {
+        //in this data we will have message datas and room
+        console.log("message data:", data);
+        const { user_id, post_id, text } = data;
+        socket.to(post_id).emit("message", data);
+        console.log(`message event got message ${data} in room ${post_id}`);
       });
     });
 
