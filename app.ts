@@ -42,8 +42,9 @@ class App {
         console.log("message data:", data);
         const { post_id } = data;
         const params: ChatsInterface = data;
-        socket.to(post_id).emit("message", data);
         Chats.create<Chats>(params);
+        data.id = data.text + Math.random;
+        socket.to(post_id).emit("message", data);
         console.log(`message event got message ${data} in room ${post_id}`);
       });
     });
