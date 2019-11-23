@@ -6,7 +6,6 @@ import cors from "cors";
 import { PostsRoutes } from "./routes/Post";
 import { DefaultRoutes } from "./routes/Default";
 import { ChatRoutes } from "./routes/Chat";
-import { hostname } from "os";
 
 import { Chats, ChatsInterface } from "./models/Chats";
 
@@ -26,7 +25,7 @@ class App {
     this.http = require("http").Server(this.app);
     //업그레이드
     this.io = require("socket.io")(this.http);
-    this.chats = this.io.of("/chats");
+    this.chats = this.io.of("/chatroom");
 
     this.chats.on("connection", (socket: any) => {
       console.log("connected");
@@ -43,7 +42,7 @@ class App {
         const { post_id } = data;
         const params: ChatsInterface = data;
         Chats.create<Chats>(params);
-        data.id = data.text + Math.random;
+        data.id = data.text + Math.random();
         socket.to(post_id).emit("message", data);
         console.log(`message event got message ${data} in room ${post_id}`);
       });
