@@ -16,10 +16,10 @@ Locations.init(
       type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
-      allowNull: false
     },
     name: {
-      type: new DataTypes.STRING()
+      type: new DataTypes.STRING(),
+      allowNull: false,
     }
   },
   {

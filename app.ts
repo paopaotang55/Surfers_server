@@ -8,16 +8,21 @@ import { DefaultRoutes } from "./routes/Default";
 import { ChatRoutes } from "./routes/Chat";
 
 import { Chats, ChatsInterface } from "./models/Chats";
+import { Users } from "./routes/User"
+
 
 class App {
   public app: express.Application;
   public connectToServer: DefaultRoutes = new DefaultRoutes();
   public routeToPosts: PostsRoutes = new PostsRoutes();
+
   public routeToChats: ChatRoutes = new ChatRoutes();
   public http: any;
   public io: any;
   public test: any;
   public chats: any;
+  public routeUser: Users = new Users();
+
 
   constructor() {
     this.app = express().bind(this);
@@ -53,6 +58,8 @@ class App {
     this.connectToServer.routes(this.app);
     this.routeToPosts.routes(this.app);
     this.routeToChats.routes(this.app);
+    this.routeUser.routes(this.app);
+
   }
 
   private config(): void {
