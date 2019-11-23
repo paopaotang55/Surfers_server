@@ -4,7 +4,6 @@ import { Locations, LocationsInterface } from "../models/Locations";
 import { Participants, ParticipantsInterface } from "../models/Paticipants";
 import { DestroyOptions } from "sequelize/types";
 import { RoomListInterface } from "./JsonInterfaces";
-import { Room } from "socket.io";
 
 Posts.belongsTo(Locations, {
   foreignKey: "location_id",
@@ -36,6 +35,7 @@ export class PostsController {
           newdatas.push(dataElement);
         }
         return res.json(newdatas);
+        // return res.json(datas);
       })
       .catch((err: Error) =>
         res.status(500).json({ message: "목록 불러오기 실패" })
@@ -43,7 +43,7 @@ export class PostsController {
   }
 
   public getMyList(req: Request, res: Response) {
-    console.log("id : ", req.params.user_id);
+    // console.log("id : ", req.params.user_id);
     Participants.findAll<Participants>({
       include: [
         {

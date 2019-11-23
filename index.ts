@@ -1,8 +1,8 @@
-import app from "./app";
+import server from "./app";
 
 const Port = 4000;
 
-app.listen(Port, err => {
+server.http.listen(Port, (err: Error) => {
   if (err) {
     console.log(`Can't listen on Port ${Port}`);
     console.log(`Error message is: ${err}`);
