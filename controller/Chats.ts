@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import { Chats, ChatsInterface } from "../models/Chats";
+import { Posts } from "../models/Posts";
+
+//Chats.hasMany(Users, {sourceKey:"user_id", foreignKey:"id"})
 
 export class ChatsController {
-  public insertChat(req: Request, res: Response) {
-    const params: any = {
-      user_id: req.body.user_id,
-      post_id: req.body.post_id,
-      text: req.body.text
-    };
-    Chats.create<Chats>(params).then((datas: Chats) => {
-      res.status(201).json(datas);
+  public getChats(req: Request, res: Response) {
+    const { post_id } = req.query.post_id;
+    Chats.findAll<Chats>({ where: { post_id: post_id } }).then((datas: any) => {
+      res.json(datas);
     });
   }
 }

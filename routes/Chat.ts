@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
+import { ChatsController } from "../controller/Chats";
 
 export class ChatRoutes {
-  public routes(app: any): void {
-    app.route("/").post();
+  public ChatsController: ChatsController = new ChatsController();
 
-    app.route("/").get();
+  public routes(app: any): void {
+    app.route("/chats").get(this.ChatsController.getChats);
   }
 }
