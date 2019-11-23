@@ -8,6 +8,8 @@ import { DefaultRoutes } from "./routes/Default";
 import { ChatRoutes } from "./routes/Chat";
 import { hostname } from "os";
 
+import { Chats, ChatsInterface } from "./models/Chats";
+
 class App {
   public app: express.Application;
   public connectToServer: DefaultRoutes = new DefaultRoutes();
@@ -38,8 +40,10 @@ class App {
       socket.on("message", (data: any) => {
         //in this data we will have message datas and room
         console.log("message data:", data);
-        const { user_id, post_id, text } = data;
+        const { post_id } = data;
+        const params: ChatsInterface = data;
         socket.to(post_id).emit("message", data);
+        Chats.create<Chats>(params);
         console.log(`message event got message ${data} in room ${post_id}`);
       });
     });
