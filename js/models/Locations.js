@@ -10,10 +10,10 @@ Locations.init({
         type: sequelize_1.DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
     },
     name: {
-        type: new sequelize_1.DataTypes.STRING()
+        type: new sequelize_1.DataTypes.STRING(),
+        allowNull: false,
     }
 }, {
     tableName: "Locations",

@@ -3,4 +3,4 @@ export const config = {
     options: {
         expiresIn: '24h'
     }
-}//ㅇㅇㅇㄹ 
+}
