@@ -5,7 +5,13 @@ import { Users } from "../models/Users";
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
 
+<<<<<<< HEAD
 Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
+=======
+// Chats.belongsTo(Posts, { foreignKey: 'post_id', targetKey: 'id' });
+Chats.belongsTo(Users, { foreignKey: 'user_id', targetKey: 'id' })
+Users.hasMany(Chats, { foreignKey: 'user_id', sourceKey: 'id' })
+>>>>>>> 3f6de3b390c96c90c6f523280dfdd3f6666bf6cd
 export class ChatsController {
   public getChats(req: Request, res: Response) {
     //   Chats.findAll<Chats>({ where: { post_id: req.query.post_id } }).then(
