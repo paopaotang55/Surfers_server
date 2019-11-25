@@ -7,7 +7,7 @@ import { userInfo } from "os";
 //유저의 이름과 사진등을 가져와야 한다.
 
 // Chats.belongsTo(Posts, { foreignKey: 'post_id', targetKey: 'id' });
-// Chats.belongsTo(Users, { foreignKey: 'user_id', targetKey: 'id' })
+Chats.belongsTo(Users, { foreignKey: 'user_id', targetKey: 'id' })
 Users.hasMany(Chats, { foreignKey: 'user_id', sourceKey: 'id' })
 export class ChatsController {
   public getChats(req: Request, res: Response) {

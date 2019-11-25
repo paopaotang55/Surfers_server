@@ -4,6 +4,7 @@ import { Locations, LocationsInterface } from "../models/Locations";
 import { Participants, ParticipantsInterface } from "../models/Paticipants";
 import { DestroyOptions } from "sequelize/types";
 import { RoomListInterface } from "./JsonInterfaces";
+import { Users } from "../models/Users";
 
 // Posts.belongsTo(Locations, {
 //   foreignKey: "location_id",
@@ -15,32 +16,82 @@ import { RoomListInterface } from "./JsonInterfaces";
 //   foreignKey: "id",
 //   sourceKey: "post_id"
 // });
+Posts.belongsTo(Locations, {
+  foreignKey: 'location_id',
+  targetKey: 'id'
+})
+Posts.hasMany(Participants, {
+  foreignKey: 'post_id',
+  sourceKey: 'id'
+})
+Participants.belongsTo(Users, {
+  foreignKey: 'user_id',
+  targetKey: 'id'
+})
+Posts.belongsTo(Users, {
+  foreignKey: 'host_id',
+  targetKey: 'id'
+})
 
 
 export class PostsController {
   public getRoomList(req: Request, res: Response) {
+    // Posts.findAll<Posts>({
+    //   include: [{ model: Locations, as: "location_name", attributes: ["name"] }]
+    // })
+    //   .then((datas: any) => {
+    //     // Array<Posts>대신, 가공을 위해 any
+    //     let newdatas = [];
+    //     for (let i = 0; i < datas.length; i++) {
+    //       let dataElement: RoomListInterface = {
+    //         id: datas[i].id,
+    //         host_id: datas[i].host_id,
+    //         host_name: datas[i].host_name,
+    //         location_name: datas[i].location_name.name,
+    //         date: datas[i].date
+    //       };
+    //       newdatas.push(dataElement);
+    //     }
+    //     return res.json(newdatas);
+    //     // return res.json(datas);
+    //   })
+    //   .catch((err: Error) =>
+    //     res.status(500).json({ message: "목록 불러오기 실패" })
+    //   );
     Posts.findAll<Posts>({
-      include: [{ model: Locations, as: "location_name", attributes: ["name"] }]
+      attributes: ['id', 'text', 'date'],
+      include: [{
+        model: Locations,
+        required: true,
+        attributes: ['name'],
+      }, {
+        model: Users,
+        required: true,
+        attributes: ['id', 'name']
+      }]
     })
       .then((datas: any) => {
-        // Array<Posts>대신, 가공을 위해 any
-        let newdatas = [];
+        let result = [];
         for (let i = 0; i < datas.length; i++) {
-          let dataElement: RoomListInterface = {
+          result.push({
             id: datas[i].id,
-            host_id: datas[i].host_id,
-            host_name: datas[i].host_name,
-            location_name: datas[i].location_name.name,
-            date: datas[i].date
-          };
-          newdatas.push(dataElement);
+            host_id: datas[i].User.id,
+            host_name: datas[i].User.name,
+            location_name: datas[i].Location.name,
+            date: datas[i].date,
+            text: datas[i].text
+          })
         }
-        return res.json(newdatas);
-        // return res.json(datas);
+        res.status(200).send(result);
       })
-      .catch((err: Error) =>
-        res.status(500).json({ message: "목록 불러오기 실패" })
-      );
+      .catch((err: Error) => {
+        res.status(500).send({
+          error: {
+            status: 500,
+            message: 'data 에러'
+          }
+        })
+      })
   }
 
   public getMyList(req: Request, res: Response) {
