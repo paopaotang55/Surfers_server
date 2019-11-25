@@ -13,11 +13,11 @@ Chats.init({
     },
     user_id: {
         type: new sequelize_1.DataTypes.INTEGER(),
-        allowNull: true
+        allowNull: false
     },
     post_id: {
         type: new sequelize_1.DataTypes.INTEGER(),
-        allowNull: true
+        allowNull: false
     },
     text: {
         type: new sequelize_1.DataTypes.STRING()
@@ -26,5 +26,5 @@ Chats.init({
     tableName: "Chats",
     sequelize: database_1.database
 });
-Chats.sync({ force: true }).then(() => console.log("Chats table created"));
+Chats.sync().then(() => console.log("Chats table created"));
 //# sourceMappingURL=Chats.js.map
