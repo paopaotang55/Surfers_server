@@ -3,15 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Posts_1 = require("../models/Posts");
 const Locations_1 = require("../models/Locations");
 const Paticipants_1 = require("../models/Paticipants");
-Posts_1.Posts.belongsTo(Locations_1.Locations, {
-    foreignKey: "location_id",
-    targetKey: "id",
-    as: "location_name"
-});
-Paticipants_1.Participants.hasMany(Posts_1.Posts, {
-    foreignKey: "id",
-    sourceKey: "post_id"
-});
+// Posts.belongsTo(Locations, {
+//   foreignKey: "location_id",
+//   targetKey: "id",
+//   // as: "location_name"
+// });
+// Participants.hasMany(Posts, {
+//   foreignKey: "id",
+//   sourceKey: "post_id"
+// });
 class PostsController {
     getRoomList(req, res) {
         Posts_1.Posts.findAll({

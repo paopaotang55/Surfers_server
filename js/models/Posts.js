@@ -12,13 +12,16 @@ Posts.init({
         primaryKey: true
     },
     host_id: {
-        type: new sequelize_1.DataTypes.INTEGER()
+        type: new sequelize_1.DataTypes.INTEGER(),
+        allowNull: false
     },
     text: {
-        type: new sequelize_1.DataTypes.STRING()
+        type: new sequelize_1.DataTypes.STRING(),
+        allowNull: false
     },
     date: {
-        type: new sequelize_1.DataTypes.STRING()
+        type: new sequelize_1.DataTypes.STRING(),
+        allowNull: false
     },
     location_id: {
         type: new sequelize_1.DataTypes.INTEGER(),

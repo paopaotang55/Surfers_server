@@ -5,16 +5,17 @@ import { Participants, ParticipantsInterface } from "../models/Paticipants";
 import { DestroyOptions } from "sequelize/types";
 import { RoomListInterface } from "./JsonInterfaces";
 
-Posts.belongsTo(Locations, {
-  foreignKey: "location_id",
-  targetKey: "id",
-  as: "location_name"
-});
+// Posts.belongsTo(Locations, {
+//   foreignKey: "location_id",
+//   targetKey: "id",
+//   // as: "location_name"
+// });
 
-Participants.hasMany(Posts, {
-  foreignKey: "id",
-  sourceKey: "post_id"
-});
+// Participants.hasMany(Posts, {
+//   foreignKey: "id",
+//   sourceKey: "post_id"
+// });
+
 
 export class PostsController {
   public getRoomList(req: Request, res: Response) {
