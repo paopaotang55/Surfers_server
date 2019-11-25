@@ -5,3 +5,9 @@ export interface RoomListInterface {
   location_name: string;
   date: string;
 }
+
+export interface ChatDBInterface {
+  user_id: number;
+  post_id: number;
+  text: string;
+}

@@ -32,7 +32,8 @@ Chats.init(
   },
   {
     tableName: "Chats",
-    sequelize: database
+    sequelize: database,
+    charset: "utf8"
   }
 );
 
