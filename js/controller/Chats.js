@@ -5,7 +5,7 @@ const Users_1 = require("../models/Users");
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" })
 //유저의 이름과 사진등을 가져와야 한다.
 // Chats.belongsTo(Posts, { foreignKey: 'post_id', targetKey: 'id' });
-// Chats.belongsTo(Users, { foreignKey: 'user_id', targetKey: 'id' })
+Chats_1.Chats.belongsTo(Users_1.Users, { foreignKey: 'user_id', targetKey: 'id' });
 Users_1.Users.hasMany(Chats_1.Chats, { foreignKey: 'user_id', sourceKey: 'id' });
 class ChatsController {
     getChats(req, res) {

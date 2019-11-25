@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Posts_1 = require("../models/Posts");
 const Locations_1 = require("../models/Locations");
 const Paticipants_1 = require("../models/Paticipants");
+const Users_1 = require("../models/Users");
 // Posts.belongsTo(Locations, {
 //   foreignKey: "location_id",
 //   targetKey: "id",
@@ -12,28 +13,80 @@ const Paticipants_1 = require("../models/Paticipants");
 //   foreignKey: "id",
 //   sourceKey: "post_id"
 // });
+Posts_1.Posts.belongsTo(Locations_1.Locations, {
+    foreignKey: 'location_id',
+    targetKey: 'id'
+});
+Posts_1.Posts.hasMany(Paticipants_1.Participants, {
+    foreignKey: 'post_id',
+    sourceKey: 'id'
+});
+Paticipants_1.Participants.belongsTo(Users_1.Users, {
+    foreignKey: 'user_id',
+    targetKey: 'id'
+});
+Posts_1.Posts.belongsTo(Users_1.Users, {
+    foreignKey: 'host_id',
+    targetKey: 'id'
+});
 class PostsController {
     getRoomList(req, res) {
+        // Posts.findAll<Posts>({
+        //   include: [{ model: Locations, as: "location_name", attributes: ["name"] }]
+        // })
+        //   .then((datas: any) => {
+        //     // Array<Posts>대신, 가공을 위해 any
+        //     let newdatas = [];
+        //     for (let i = 0; i < datas.length; i++) {
+        //       let dataElement: RoomListInterface = {
+        //         id: datas[i].id,
+        //         host_id: datas[i].host_id,
+        //         host_name: datas[i].host_name,
+        //         location_name: datas[i].location_name.name,
+        //         date: datas[i].date
+        //       };
+        //       newdatas.push(dataElement);
+        //     }
+        //     return res.json(newdatas);
+        //     // return res.json(datas);
+        //   })
+        //   .catch((err: Error) =>
+        //     res.status(500).json({ message: "목록 불러오기 실패" })
+        //   );
         Posts_1.Posts.findAll({
-            include: [{ model: Locations_1.Locations, as: "location_name", attributes: ["name"] }]
+            attributes: ['id', 'text', 'date'],
+            include: [{
+                    model: Locations_1.Locations,
+                    required: true,
+                    attributes: ['name'],
+                }, {
+                    model: Users_1.Users,
+                    required: true,
+                    attributes: ['id', 'name']
+                }]
         })
             .then((datas) => {
-            // Array<Posts>대신, 가공을 위해 any
-            let newdatas = [];
+            let result = [];
             for (let i = 0; i < datas.length; i++) {
-                let dataElement = {
+                result.push({
                     id: datas[i].id,
-                    host_id: datas[i].host_id,
-                    host_name: datas[i].host_name,
-                    location_name: datas[i].location_name.name,
-                    date: datas[i].date
-                };
-                newdatas.push(dataElement);
+                    host_id: datas[i].User.id,
+                    host_name: datas[i].User.name,
+                    location_name: datas[i].Location.name,
+                    date: datas[i].date,
+                    text: datas[i].text
+                });
             }
-            return res.json(newdatas);
-            // return res.json(datas);
+            res.status(200).send(result);
         })
-            .catch((err) => res.status(500).json({ message: "목록 불러오기 실패" }));
+            .catch((err) => {
+            res.status(500).send({
+                error: {
+                    status: 500,
+                    message: 'data 에러'
+                }
+            });
+        });
     }
     getMyList(req, res) {
         // console.log("id : ", req.params.user_id);
