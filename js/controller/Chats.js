@@ -38,7 +38,7 @@ class ChatsController {
             res.status(500).send({
                 error: {
                     status: 500,
-                    message: 'chat data 에러'
+                    message: '채팅 데이터 불어오기 실패'
                 }
             });
         });
