@@ -8,8 +8,8 @@ import { DefaultRoutes } from "./routes/Default";
 import { ChatRoutes } from "./routes/Chat";
 
 import { Chats, ChatsInterface } from "./models/Chats";
-import { Users } from "./routes/User"
-
+import { Users } from "./routes/User";
+import { ChatDBInterface } from "./controller/JsonInterfaces";
 
 class App {
   public app: express.Application;
@@ -22,7 +22,6 @@ class App {
   public test: any;
   public chats: any;
   public routeUser: Users = new Users();
-
 
   constructor() {
     this.app = express().bind(this);
@@ -43,11 +42,15 @@ class App {
 
       socket.on("message", (data: any) => {
         //in this data we will have message datas and room
+
         console.log("message data:", data);
         const { post_id } = data;
-        const params: ChatsInterface = data;
-        Chats.create<Chats>(params);
-        data.id = data.text + Math.random();
+        const dbObj: ChatDBInterface = {
+          user_id: data.user._id,
+          post_id: post_id,
+          text: data.text
+        };
+        Chats.create<Chats>(dbObj);
         socket.to(post_id).emit("message", data);
         console.log(`message event got message ${data} in room ${post_id}`);
       });
@@ -59,7 +62,6 @@ class App {
     this.routeToPosts.routes(this.app);
     this.routeToChats.routes(this.app);
     this.routeUser.routes(this.app);
-
   }
 
   private config(): void {

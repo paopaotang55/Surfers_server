@@ -17,36 +17,38 @@ Participants.belongsTo(Posts, {
   targetKey: "id"
 });
 Posts.belongsTo(Locations, {
-  foreignKey: 'location_id',
-  targetKey: 'id'
-})
+  foreignKey: "location_id",
+  targetKey: "id"
+});
 Posts.hasMany(Participants, {
-  foreignKey: 'post_id',
-  sourceKey: 'id'
-})
+  foreignKey: "post_id",
+  sourceKey: "id"
+});
 Participants.belongsTo(Users, {
-  foreignKey: 'user_id',
-  targetKey: 'id'
-})
+  foreignKey: "user_id",
+  targetKey: "id"
+});
 Posts.belongsTo(Users, {
-  foreignKey: 'host_id',
-  targetKey: 'id'
-})
-
+  foreignKey: "host_id",
+  targetKey: "id"
+});
 
 export class PostsController {
   public getRoomList(req: Request, res: Response) {
     Posts.findAll<Posts>({
-      attributes: ['id', 'text', 'date'],
-      include: [{
-        model: Locations,
-        required: true,
-        attributes: ['name'],
-      }, {
-        model: Users,
-        required: true,
-        attributes: ['id', 'name']
-      }]
+      attributes: ["id", "text", "date"],
+      include: [
+        {
+          model: Locations,
+          required: true,
+          attributes: ["name"]
+        },
+        {
+          model: Users,
+          required: true,
+          attributes: ["id", "name"]
+        }
+      ]
     })
       .then((datas: any) => {
         let result = [];
@@ -58,7 +60,7 @@ export class PostsController {
             location_name: datas[i].Location.name,
             date: datas[i].date,
             text: datas[i].text
-          })
+          });
         }
         res.status(200).send(result);
       })
@@ -66,55 +68,54 @@ export class PostsController {
         res.status(500).send({
           error: {
             status: 500,
-            message: 'db쪽 문제'
+            message: "db쪽 문제"
           }
-        })
-      })
+        });
+      });
   }
 
   public getMyList(req: Request, res: Response) {
     Participants.findAll<Participants>({
-      attributes: ['post_id', 'user_id'],
+      attributes: ["post_id", "user_id"],
       include: [
         {
           model: Posts,
           required: true,
-          attributes: ['date'],
-          include: [
-            { model: Locations, required: true, attributes: ["name"] }
-          ]
+          attributes: ["date"],
+          include: [{ model: Locations, required: true, attributes: ["name"] }]
         },
         {
           model: Users,
           required: true,
-          attributes: ['name']
+          attributes: ["name"]
         }
       ],
       where: {
         user_id: req.body.info.user_id
       }
-    }).then((datas: any) => {
-      let newdatas = [];
-      for (let i = 0; i < datas.length; i++) {
-        let dataElement: RoomListInterface = {
-          id: datas[i].post_id,
-          host_id: datas[i].user_id,
-          host_name: datas[i].User.name,
-          location_name: datas[i].Post.Location.name,
-          date: datas[i].Post.date
-        };
-        newdatas.push(dataElement);
-      }
-      res.status(200).send(newdatas);
     })
+      .then((datas: any) => {
+        let newdatas = [];
+        for (let i = 0; i < datas.length; i++) {
+          let dataElement: RoomListInterface = {
+            id: datas[i].post_id,
+            host_id: datas[i].user_id,
+            host_name: datas[i].User.name,
+            location_name: datas[i].Post.Location.name,
+            date: datas[i].Post.date
+          };
+          newdatas.push(dataElement);
+        }
+        res.status(200).send(newdatas);
+      })
       .catch((err: Error) => {
         res.status(500).send({
           error: {
             status: 500,
-            message: '나의 모임 목록 불러오기 실패'
+            message: "나의 모임 목록 불러오기 실패"
           }
-        })
-      })
+        });
+      });
   }
 
   public makeRoomOrAddMyList(req: Request, res: Response) {
@@ -133,13 +134,17 @@ export class PostsController {
     //   });
     // }
     let array: string[] = Object.keys(req.body);
-    if ((array.indexOf('location') === -1) || (array.indexOf('date') === -1) || (array.indexOf('text') === -1)) {
+    if (
+      array.indexOf("location") === -1 ||
+      array.indexOf("date") === -1 ||
+      array.indexOf("text") === -1
+    ) {
       return res.status(400).send({
         error: {
           status: 400,
           message: "body를 다음과 같이 수정해주세요,{location, date, text}"
         }
-      })
+      });
     }
     let name: string = req.body.location;
     let date: string = req.body.date;
@@ -171,8 +176,8 @@ export class PostsController {
                       location: name,
                       date: data2.date,
                       text: data2.text
-                    }
-                    res.status(201).send(data)
+                    };
+                    res.status(201).send(data);
                   })
                   .catch((err: Error) => {
                     res.status(500).send({
@@ -180,20 +185,20 @@ export class PostsController {
                         status: 500,
                         message: "모임 생성 실패"
                       }
-                    })
-                  })
+                    });
+                  });
               })
               .catch((err: Error) => {
-                res.status(500).send("db쪽 문제 Posts")
-              })
+                res.status(500).send("db쪽 문제 Posts");
+              });
           })
           .catch((err: Error) => {
-            res.status(500).send("db쪽 문제 Participants")
-          })
+            res.status(500).send("db쪽 문제 Participants");
+          });
       })
       .catch((err: Error) => {
-        res.status(500).send("db쪽 문제 Posts")
-      })
+        res.status(500).send("db쪽 문제 Posts");
+      });
   }
   public getRoomInfo(req: Request, res: Response) {
     if (!("post_id" in req.query)) {
@@ -202,37 +207,41 @@ export class PostsController {
           status: 400,
           message: "body를 다음과 같이 수정해주세요,{post_id}"
         }
-      })
+      });
     }
     let post_id: number = req.query.post_id;
     Posts.findOne<Posts>({
       attributes: ["host_id", "date", "text", "pay"],
-      include: [{
-        model: Locations,
-        required: true,
-        attributes: ["name"]
-      },
-      {
-        model: Users,
-        required: true,
-        attributes: ["name"]
-      }],
+      include: [
+        {
+          model: Locations,
+          required: true,
+          attributes: ["name"]
+        },
+        {
+          model: Users,
+          required: true,
+          attributes: ["name"]
+        }
+      ],
       where: { id: post_id }
     })
       .then((datas1: any) => {
         Participants.findAll<Participants>({
           attributes: ["post_id"],
-          include: [{
-            model: Users,
-            required: true,
-            attributes: ['name'],
-          }],
+          include: [
+            {
+              model: Users,
+              required: true,
+              attributes: ["name"]
+            }
+          ],
           where: { post_id }
         })
           .then((datas2: any) => {
             let arr = [];
             for (let i = 0; i < datas2.length; i++) {
-              arr.push(datas2[i].User.name)
+              arr.push(datas2[i].User.name);
             }
             let result: any = {
               id: post_id,
@@ -242,9 +251,9 @@ export class PostsController {
               date: datas1.date,
               text: datas1.text,
               pay: datas1.pay,
-              participants: arr,
-            }
-            res.status(200).send(result)
+              participants: arr
+            };
+            res.status(200).send(result);
           })
           .catch((err: Error) => {
             res.status(500).send({
@@ -252,12 +261,12 @@ export class PostsController {
                 status: 500,
                 message: "룸을 불러 올수 없음"
               }
-            })
-          })
+            });
+          });
       })
       .catch((err: Error) => {
-        res.status(500).send("db쪽 문제 Posts")
-      })
+        res.status(500).send("db쪽 문제 Posts");
+      });
   }
   //같이가기
   public createFromList(req: Request, res: Response) {
@@ -267,14 +276,14 @@ export class PostsController {
           status: 400,
           message: "body를 다음과 같이 수정해주세요,{ post_id }"
         }
-      })
+      });
     }
     const post_id: number = req.body.post_id;
     let user_id: number = req.body.info.user_id;
-    let data: ParticipantsInterface = { post_id, user_id }
+    let data: ParticipantsInterface = { post_id, user_id };
     Participants.create<Participants>(data)
       .then(() => {
-        return res.status(200).send({ message: "성공적으로 등록되었습니다." })
+        return res.status(200).send({ message: "성공적으로 등록되었습니다." });
       })
       .catch((err: Error) => {
         return res.status(500).send({
@@ -282,7 +291,7 @@ export class PostsController {
             status: 500,
             message: "같이가기 실패"
           }
-        })
+        });
       });
   }
   //룸에서 나가기
@@ -295,7 +304,7 @@ export class PostsController {
           status: 400,
           message: "body를 다음과 같이 수정해주세요,{ post_id }"
         }
-      })
+      });
     }
     let post_id: number = req.query.post_id;
     let user_id: number = req.body.info.user_id;
@@ -304,8 +313,8 @@ export class PostsController {
     };
     Participants.destroy(options)
       .then(() => {
-        console.log("제거 성공")
-        return res.status(200).send({ message: "성공적으로 제거되었습니다." })
+        console.log("제거 성공");
+        return res.status(200).send({ message: "성공적으로 제거되었습니다." });
       })
       .catch((err: Error) => {
         return res.status(500).send({
@@ -313,7 +322,7 @@ export class PostsController {
             status: 500,
             message: "목록에서 제거 실패"
           }
-        })
+        });
       });
   }
 }

@@ -32,10 +32,10 @@ Chats.init(
   },
   {
     tableName: "Chats",
-    sequelize: database
+    sequelize: database,
+    charset: "utf8"
   }
 );
-
 
 Chats.sync().then(() => console.log("Chats table created"));
 

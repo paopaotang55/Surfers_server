@@ -6,4 +6,8 @@ node_modules
 ## json.files##
 package-lock.json
 config
+database
+database.ts
+./js
+
 js
