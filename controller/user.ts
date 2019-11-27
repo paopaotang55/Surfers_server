@@ -66,7 +66,7 @@ export class User {
                             .then(() => {
                                 return res.status(201).send({ message: "회원가입 성공" });
                             })
-                            .catch((err) => {
+                            .catch((err: Error) => {
                                 return res.status(500).send({
                                     error: {
                                         status: 500,
@@ -76,7 +76,7 @@ export class User {
                             })
                     }
                 })
-                .catch((err) => {
+                .catch((err: Error) => {
                     return res.status(500).send({
                         error: {
                             status: 500,
@@ -105,7 +105,7 @@ export class User {
             .then((user) => {
                 if (user) {
                     let user_id: number = +user.id;
-                    return res.status(200).send({ message: "로그인 완료", user_id, token: tokenSign({ user_id, email }) })
+                    return res.status(200).send({ message: "로그인 완료", token: tokenSign({ user_id, email }) })
                 } else {
                     return res.status(406).send({
                         error: {
@@ -124,9 +124,6 @@ export class User {
                 })
             })
     }
-    signout(req: Request, res: Response) {
-
-    }
 
     userPut(req: Request, res: Response) {
         let arr: string[] = Object.keys(req.body);
@@ -139,7 +136,7 @@ export class User {
                 }
             })
         }
-        let email: string = req.body.email.email;  // api 
+        let email: string = req.body.info.email;  // api 
         let name1: string = req.body.name;
         let password1: string = req.body.password;
         let image1: Blob = req.body.image;
@@ -201,11 +198,16 @@ export class User {
             let token1: string = bearerToken.split(' ')[1];
             console.log(token1)
             if (tokenVerify(token1)) {
-                req.body.email = jwt.verify(token1, config.secret)
+                req.body.info = jwt.verify(token1, config.secret)
                 console.log(req)
                 next();
             } else {
-                return res.send("무효한 token 입니다")
+                return res.status(401).send({
+                    error: {
+                        status: 401,
+                        message: "로그인 상태가 아닙니다"
+                    }
+                })
             }
         } catch (err) {
             return res.status(401).send({

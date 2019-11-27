@@ -10,7 +10,5 @@ export class Users {
             .post(this.controller.signup)
         app.route('/user/signin')
             .post(this.controller.signin)
-        app.route('user/singnout')
-            .post(this.controller.signout)
     }
 }
