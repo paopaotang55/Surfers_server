@@ -4,6 +4,7 @@ export interface RoomListInterface {
   host_name: string;
   location_name: string;
   date: string;
+  spot_name: string;
 }
 
 export interface ChatDBInterface {

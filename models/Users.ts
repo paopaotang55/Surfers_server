@@ -26,12 +26,11 @@ Users.init(
       primaryKey: true
     },
     name: {
-      type: new DataTypes.STRING(50),
+      type: new DataTypes.STRING(),
       allowNull: false,
-      unique: true
     },
     email: {
-      type: new DataTypes.STRING(50),
+      type: new DataTypes.STRING(100),
       allowNull: false,
       unique: true,
     },
@@ -69,3 +68,15 @@ Users.init(
 
 Users.sync().then(() => console.log("Users table created"));
 
+export interface UsersInterface {
+  name: string;
+  email: string;
+  password?: string;
+  image?: Blob;
+  img_url?: string;
+  oAuth: number;
+  point?: number;
+  phone?: string;
+  level?: string;
+  pay_id?: string;
+}

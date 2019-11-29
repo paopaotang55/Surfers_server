@@ -2,12 +2,11 @@ import { Request, Response } from "express";
 import { Chats, ChatsInterface } from "../models/Chats";
 import { Users } from "../models/Users";
 
+
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
 
-// Chats.belongsTo(Posts, { foreignKey: 'post_id', targetKey: 'id' });
-Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
-Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
+// Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
 export class ChatsController {
   public getChats(req: Request, res: Response) {
     //   Chats.findAll<Chats>({ where: { post_id: req.query.post_id } }).then(
@@ -33,7 +32,15 @@ export class ChatsController {
     //     }
     //   );
     // }
-
+    if (!("post_id" in req.query)) {
+      return res.status(400).send({
+        error: {
+          status: 400,
+          message: "다음과 같이 수정해주세요, post_id=1"
+        }
+      })
+    }
+    let post_id: number = req.query.post_id;
     Chats.findAll<Chats>({
       attributes: ["id", "post_id", "text", "createdAt"],
       include: [
@@ -43,7 +50,7 @@ export class ChatsController {
           attributes: ["id", "name", "img_url"]
         }
       ],
-      where: { post_id: req.query.post_id }
+      where: { post_id }
     })
       .then((data: any) => {
         let result = [];
@@ -54,7 +61,7 @@ export class ChatsController {
             text: data[i].text,
             createdAt: data[i].createdAt,
             user: {
-              id: data[i].id,
+              _id: data[i].id,
               name: data[i].User.name,
               avatar: data[i].User.img_url
             }
