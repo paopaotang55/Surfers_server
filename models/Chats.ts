@@ -6,6 +6,7 @@ export class Chats extends Model {
   public user_id!: number;
   public post_id!: number;
   public text?: string;
+  public push_token: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -28,6 +29,9 @@ Chats.init(
     },
     text: {
       type: new DataTypes.STRING()
+    },
+    push_token: {
+      type: new DataTypes.STRING()
     }
   },
   {
@@ -43,4 +47,5 @@ export interface ChatsInterface {
   user_id: number;
   post_id: number;
   text: string;
+  push_token: string;
 }
