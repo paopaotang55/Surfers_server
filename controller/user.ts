@@ -3,6 +3,10 @@ import { Users, UsersInterface } from "../models/Users"
 import jwt from 'jsonwebtoken';
 import crypto from "crypto";
 import { config } from '../config';
+import serveStatic from "serve-static";
+import { Participants } from "../models/Paticipants";
+import { Chats } from "../models/Chats";
+import { Posts } from "../models/Posts";
 
 interface Token {
     user_id: number;
@@ -26,7 +30,6 @@ function tokenSign(user: Token): string {
 }
 
 export class User {
-
     signup(req: Request, res: Response) {
         let array: string[] = Object.keys(req.body);
         if ((array.indexOf('name') === -1) || (array.indexOf('password') === -1) ||
@@ -44,8 +47,9 @@ export class User {
         let phone: string = req.body.phone;
         if (oAuth === 0) {
             let password: string = req.body.password;
-            Users.findOne<Users>({ where: { email: email } })
+            Users.findOne<Users>({ where: { email } })
                 .then((user) => {
+                    console.log(user);
                     if (user) {
                         return res.status(409).send({
                             error: {
@@ -220,8 +224,69 @@ export class User {
             })
         }
     }
+    tokenCheck(req: Request, res: Response) {
+        let bearerToken: string | undefined = req.headers.authorization;
+        if (!bearerToken) {
+            return res.send("token 없음")
+        }
+        let token1: string = bearerToken.split(' ')[1];
+        if (tokenVerify(token1)) {
+            return res.status(200).send({ message: true })
+        } else {
+            return res.status(400).send({ message: false })
+        }
+    }
+    deleteUser(req: Request, res: Response) {
+        let id: number = req.body.info.user_id;
+        Users.destroy({ where: { id } })
+            .then(() => {
+                Participants.destroy({ where: { user_id: id } })
+                    .then(() => {
+                        Chats.destroy({ where: { user_id: id } })
+                            .then(() => {
+                                Posts.destroy({ where: { host_id: id } })
+                                    .then(() => {
+                                        res.status(201).send({ message: "회원 탈퇴" })
+                                    })
+                                    .catch((err: Error) => {
+                                        res.status(500).send({
+                                            error: {
+                                                status: 500,
+                                                message: "회원 탈퇴 실패"
+                                            }
+                                        })
+                                    })
+                            })
+                            .catch((err: Error) => {
+                                res.status(500).send({
+                                    error: {
+                                        status: 500,
+                                        message: "회원 탈퇴 실패3"
+                                    }
+                                })
+                            })
+                    })
+                    .catch((err: Error) => {
+                        res.status(500).send({
+                            error: {
+                                status: 500,
+                                message: "회원 탈퇴 실패2"
+                            }
+                        })
+                    })
+            })
+            .catch((err: Error) => {
+                res.status(500).send({
+                    error: {
+                        status: 500,
+                        message: "회원 탈퇴 실패1"
+                    }
+                })
+            })
+    }
+
     check(req: Request, res: Response) {
-        res.send("url 확인 부탁드립니다")
+        res.send({ message: "url 확인 부탁드립니다" })
     }
 }
 
