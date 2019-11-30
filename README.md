@@ -1,3 +1,4 @@
 # chiMe-server
 
-yarn add expo-server-sdk
+npm install --save expo-server-sdk
+npm install @types/node-fetch

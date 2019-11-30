@@ -13,6 +13,7 @@ export class Users extends Model {
   public phone?: string;
   public level?: string;
   public pay_id?: string;
+  public push_token?: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -33,7 +34,7 @@ Users.init(
     email: {
       type: new DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
+      unique: true
     },
     password: {
       type: new DataTypes.STRING()
@@ -45,7 +46,7 @@ Users.init(
       type: new DataTypes.STRING()
     },
     point: {
-      type: new DataTypes.INTEGER(),
+      type: new DataTypes.INTEGER()
     },
     phone: {
       type: new DataTypes.STRING()
@@ -58,7 +59,10 @@ Users.init(
     },
     oAuth: {
       type: new DataTypes.INTEGER(),
-      allowNull: false,
+      allowNull: false
+    },
+    push_token: {
+      type: new DataTypes.STRING()
     }
   },
   {
@@ -68,4 +72,3 @@ Users.init(
 );
 
 Users.sync().then(() => console.log("Users table created"));
-

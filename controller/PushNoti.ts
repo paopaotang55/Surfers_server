@@ -27,7 +27,7 @@ for (let pushToken of somePushTokens) {
 
 //메세지들은 한꺼번에 보내기 위해,
 let chunks = expo.chunkPushNotifications(messages);
-let tickets: any[] = [];
+let tickets: ExpoPushReceipt[] = [];
 (async () => {
   // Send the chunks to the Expo push notification service. There are
   // different strategies you could use. A simple one is to send one chunk at a
@@ -52,40 +52,37 @@ let tickets: any[] = [];
 //영수증은 가끔 반드시 해결해야 할 에러코드를 포함한다. 특히 애플이나 구글이 알림이 차단되었거나 앱이 삭제된 디바이스에 알림을 보내는 앱들을 차단 할 수 있다.
 //expo는 이와 관련해서는 어떠한 조정을 하지 않으며, 애플이나 구글에 피드백을 보내지도 않는다. 그러니 알아서 잘~해라.
 
-let receiptIds = [];
-for (let ticket of tickets) {
-  // NOTE: Not all tickets have IDs; for example, tickets for notifications
-  // that could not be enqueued will have error information and no receipt ID.
-  if (ticket.id) {
-    receiptIds.push(ticket.id);
-  }
-}
+// let receiptIds = [];
+// for (let ticket of tickets) {
+//   // 모든 티켓들이 ID를 가지는건 아님. 예를 들자면, 큐에 더해질 수 없는 티켓들은 ID대신 error코드를 갖고 있을 것이다.
+//   if (ticket.id) {
+//     receiptIds.push(ticket.id);
+//   }
+// }
 
-let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
-(async () => {
-  // Like sending notifications, there are different strategies you could use
-  // to retrieve batches of receipts from the Expo service.
-  for (let chunk of receiptIdChunks) {
-    try {
-      let receipts: any = await expo.getPushNotificationReceiptsAsync(chunk);
-      console.log(receipts);
+// let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
+// (async () => {
+//   // noti를 보내는 것 처럼, expo서비스로부터 온 영수증 뭉치를 탐색하는 각기 다른 방법들이 있다.
+//   for (let chunk of receiptIdChunks) {
+//     try {
+//       let receipts: any = await expo.getPushNotificationReceiptsAsync(chunk);
+//       console.log(receipts);
 
-      // The receipts specify whether Apple or Google successfully received the
-      // notification and information about an error, if one occurred.
-      for (let receipt of receipts) {
-        if (receipt.status === "ok") {
-          continue;
-        } else if (receipt.status === "error") {
-          console.error(
-            `There was an error sending a notification: ${receipt.message}`
-          );
-          if (receipt.details && receipt.details.error) {
-            console.error(`The error code is ${receipt.details.error}`);
-          }
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-})();
+//       // 영수증은 구글이 noti를 성공적으로 받았는지 아니면 error코드를 받았는지, 뭐라도 받으면 그에대해 명시한다.
+//       for (let receipt of receipts) {
+//         if (receipt.status === "ok") {
+//           continue;
+//         } else if (receipt.status === "error") {
+//           console.error(
+//             `There was an error sending a notification: ${receipt.message}`
+//           );
+//           if (receipt.details && receipt.details.error) {
+//             console.error(`The error code is ${receipt.details.error}`);
+//           }
+//         }
+//       }
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   }
+// })();

@@ -6,7 +6,6 @@ export class Chats extends Model {
   public user_id!: number;
   public post_id!: number;
   public text?: string;
-  public push_token: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

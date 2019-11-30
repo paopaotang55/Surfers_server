@@ -5,7 +5,6 @@ import { Users } from "../models/Users";
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
 
-// Chats.belongsTo(Posts, { foreignKey: 'post_id', targetKey: 'id' });
 Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
 Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
 export class ChatsController {
@@ -70,5 +69,13 @@ export class ChatsController {
           }
         });
       });
+  }
+
+  public async post_pushToken(req: Request, res: Response) {
+    await Users.update<Users>(
+      { push_token: req.body.push_token },
+      { where: { email: req.body.email } }
+    );
+    await res.status(200).send({ message: "push_token 저장 완료" });
   }
 }
