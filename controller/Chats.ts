@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { Chats, ChatsInterface } from "../models/Chats";
 import { Users } from "../models/Users";
 
-
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
 
-// Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
+Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
+Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
 export class ChatsController {
   public getChats(req: Request, res: Response) {
     //   Chats.findAll<Chats>({ where: { post_id: req.query.post_id } }).then(
@@ -38,7 +38,7 @@ export class ChatsController {
           status: 400,
           message: "다음과 같이 수정해주세요, post_id=1"
         }
-      })
+      });
     }
     let post_id: number = req.query.post_id;
     Chats.findAll<Chats>({
@@ -77,5 +77,13 @@ export class ChatsController {
           }
         });
       });
+  }
+
+  public async post_pushToken(req: Request, res: Response) {
+    await Users.update<Users>(
+      { push_token: req.body.push_token },
+      { where: { email: req.body.email } }
+    );
+    await res.status(200).send({ message: "push_token 저장 완료" });
   }
 }

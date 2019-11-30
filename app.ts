@@ -18,7 +18,6 @@ class App {
   public app: express.Application;
   public connectToServer: DefaultRoutes = new DefaultRoutes();
   public routeToPosts: PostsRoutes = new PostsRoutes();
-
   public routeToChats: ChatRoutes = new ChatRoutes();
   public http: any;
   public io: any;

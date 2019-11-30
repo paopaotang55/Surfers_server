@@ -28,6 +28,9 @@ Chats.init(
     },
     text: {
       type: new DataTypes.STRING()
+    },
+    push_token: {
+      type: new DataTypes.STRING()
     }
   },
   {
@@ -43,4 +46,5 @@ export interface ChatsInterface {
   user_id: number;
   post_id: number;
   text: string;
+  push_token: string;
 }

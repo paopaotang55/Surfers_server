@@ -2,12 +2,14 @@
 
 ## node modules ##
 node_modules
+database
+config
+js
 
 ## json.files##
 package-lock.json
 package.json
 config
-database
-database.ts
-./js
-js
+yarn.lock
+yarn-error.log
+

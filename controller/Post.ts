@@ -8,42 +8,42 @@ import { Users } from "../models/Users";
 import { Chats } from "../models/Chats";
 import { Spots } from "../models/Spots";
 
-Posts.belongsTo(Locations, {
-  foreignKey: "location_id",
-  targetKey: "id"
-});
-Posts.belongsTo(Users, {
-  foreignKey: "host_id",
-  targetKey: "id"
-});
-Participants.belongsTo(Posts, {
-  foreignKey: "post_id",
-  targetKey: "id"
-});
-Participants.belongsTo(Users, {
-  foreignKey: "user_id",
-  targetKey: "id"
-});
-Chats.belongsTo(Posts, {
-  foreignKey: "post_id",
-  targetKey: "id"
-});
-Chats.belongsTo(Users, {
-  foreignKey: "user_id",
-  targetKey: "id"
-});
-Spots.belongsTo(Locations, {
-  foreignKey: "location_id",
-  targetKey: "id"
-})
-Spots.hasMany(Posts, {
-  foreignKey: "spot_id",
-  sourceKey: "id"
-})
-Posts.belongsTo(Spots, {
-  foreignKey: "spot_id",
-  targetKey: "id"
-})
+// Posts.belongsTo(Locations, {
+//   foreignKey: "location_id",
+//   targetKey: "id"
+// });
+// Posts.belongsTo(Users, {
+//   foreignKey: "host_id",
+//   targetKey: "id"
+// });
+// Participants.belongsTo(Posts, {
+//   foreignKey: "post_id",
+//   targetKey: "id"
+// });
+// Participants.belongsTo(Users, {
+//   foreignKey: "user_id",
+//   targetKey: "id"
+// });
+// Chats.belongsTo(Posts, {
+//   foreignKey: "post_id",
+//   targetKey: "id"
+// });
+// Chats.belongsTo(Users, {
+//   foreignKey: "user_id",
+//   targetKey: "id"
+// });
+// Spots.belongsTo(Locations, {
+//   foreignKey: "location_id",
+//   targetKey: "id"
+// })
+// Spots.hasMany(Posts, {
+//   foreignKey: "spot_id",
+//   sourceKey: "id"
+// })
+// Posts.belongsTo(Spots, {
+//   foreignKey: "spot_id",
+//   targetKey: "id"
+// })
 
 export class PostsController {
   //전체 모임 목록
@@ -82,12 +82,17 @@ export class PostsController {
             spot_name: datas[i].Spot.name
           });
         }
-        Participants.findAll<Participants>({ attributes: ["post_id"], where: { user_id } })
+        Participants.findAll<Participants>({
+          attributes: ["post_id"],
+          where: { user_id }
+        })
           .then((data: any) => {
             let ids: number[] = data.map((item: any) => item.post_id);
             if (ids.length === 0) {
-              result.forEach(item => { item.participate = false; });
-              return res.status(200).send(result)
+              result.forEach(item => {
+                item.participate = false;
+              });
+              return res.status(200).send(result);
             } else {
               result.forEach(item => {
                 if (ids.indexOf(item.id) !== -1) {
@@ -95,13 +100,13 @@ export class PostsController {
                 } else {
                   item.participate = false;
                 }
-              })
-              return res.status(200).send(result)
+              });
+              return res.status(200).send(result);
             }
           })
           .catch((err: Error) => {
-            res.status(500).send("db쪽 문제 Participants")
-          })
+            res.status(500).send("db쪽 문제 Participants");
+          });
       })
       .catch((err: Error) => {
         res.status(500).send({
@@ -121,7 +126,10 @@ export class PostsController {
           model: Posts,
           required: true,
           attributes: ["date"],
-          include: [{ model: Locations, required: true, attributes: ["name"] }, { model: Spots, required: true, attributes: ["name"] }]
+          include: [
+            { model: Locations, required: true, attributes: ["name"] },
+            { model: Spots, required: true, attributes: ["name"] }
+          ]
         },
         {
           model: Users,
@@ -169,7 +177,8 @@ export class PostsController {
       return res.status(400).send({
         error: {
           status: 400,
-          message: "body를 다음과 같이 수정해주세요,{location, date, text. spot}"
+          message:
+            "body를 다음과 같이 수정해주세요,{location, date, text. spot}"
         }
       });
     }
@@ -192,7 +201,7 @@ export class PostsController {
               spot_id: data.id
             };
             Posts.create<Posts>(post)
-              .then((data2) => {
+              .then(data2 => {
                 Participants.create<Participants>({
                   user_id: host_id,
                   post_id: data2.id
@@ -239,9 +248,8 @@ export class PostsController {
           });
       })
       .catch((err: Error) => {
-        res.status(500).send("db쪽 에러 Spots")
-      })
-
+        res.status(500).send("db쪽 에러 Spots");
+      });
   }
   //룸 내용 불어오기
   public getRoomInfo(req: Request, res: Response) {
@@ -334,12 +342,14 @@ export class PostsController {
     Participants.findOne<Participants>({ where: { post_id, user_id } })
       .then((data: any) => {
         if (data) {
-          return res.send("이미 참가하였습니다")
+          return res.send("이미 참가하였습니다");
         } else {
           let data1: ParticipantsInterface = { post_id, user_id };
           Participants.create<Participants>(data1)
             .then(() => {
-              return res.status(200).send({ message: "성공적으로 등록되었습니다." });
+              return res
+                .status(200)
+                .send({ message: "성공적으로 등록되었습니다." });
             })
             .catch((err: Error) => {
               return res.status(500).send({
@@ -352,8 +362,8 @@ export class PostsController {
         }
       })
       .catch((err: Error) => {
-        return res.status(500).send("db쪽 문제 Participants")
-      })
+        return res.status(500).send("db쪽 문제 Participants");
+      });
   }
   //룸에서 나가기
   public deleteFromList(req: Request, res: Response) {
@@ -389,7 +399,7 @@ export class PostsController {
   getLocationList(req: Request, res: Response) {
     Locations.findAll<Locations>({})
       .then((datas: any) => {
-        let arr: string[] = datas.map((item: any) => item.name)
+        let arr: string[] = datas.map((item: any) => item.name);
         res.status(200).send(arr);
       })
       .catch((err: Error) => {
@@ -398,8 +408,8 @@ export class PostsController {
             status: 500,
             message: "데이터 불러오기 실패"
           }
-        })
-      })
+        });
+      });
   }
   //spot 상세 정보
   getSpotInfo(req: Request, res: Response) {
@@ -409,27 +419,29 @@ export class PostsController {
           status: 400,
           message: "다음과 같이 수정해주세요, location_name=제주"
         }
-      })
+      });
     }
     let location_name: string = req.query.location_name;
     Spots.findAll<Spots>({
       attributes: ["name", "X", "Y"],
-      include: [{
-        model: Locations,
-        attributes: ["name"],
-        where: {
-          name: location_name
+      include: [
+        {
+          model: Locations,
+          attributes: ["name"],
+          where: {
+            name: location_name
+          }
         }
-      }]
+      ]
     })
       .then((data: any) => {
         let arr = data.map((item: any) => {
-          return { [item.name]: { X: item.X, Y: item.Y } }
-        })
+          return { [item.name]: { X: item.X, Y: item.Y } };
+        });
         res.status(200).send(arr);
       })
       .catch((err: Error) => {
-        res.status(500).send({ message: "db쪽 에러" })
-      })
+        res.status(500).send({ message: "db쪽 에러" });
+      });
   }
 }

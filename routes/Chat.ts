@@ -6,5 +6,6 @@ export class ChatRoutes {
 
   public routes(app: any): void {
     app.route("/chat").get(this.ChatsController.getChats);
+    app.route("/chat/push_token").put(this.ChatsController.post_pushToken);
   }
 }
