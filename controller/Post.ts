@@ -5,36 +5,50 @@ import { Participants, ParticipantsInterface } from "../models/Paticipants";
 import { DestroyOptions } from "sequelize/types";
 import { RoomListInterface } from "./JsonInterfaces";
 import { Users } from "../models/Users";
+import { Chats } from "../models/Chats";
+import { Spots } from "../models/Spots";
 
-// Posts.belongsTo(Locations, {
-//   foreignKey: "location_id",
-//   targetKey: "id",
-//   // as: "location_name"
-// });
-
-Participants.belongsTo(Posts, {
-  foreignKey: "post_id",
-  targetKey: "id"
-});
 Posts.belongsTo(Locations, {
   foreignKey: "location_id",
-  targetKey: "id"
-});
-Posts.hasMany(Participants, {
-  foreignKey: "post_id",
-  sourceKey: "id"
-});
-Participants.belongsTo(Users, {
-  foreignKey: "user_id",
   targetKey: "id"
 });
 Posts.belongsTo(Users, {
   foreignKey: "host_id",
   targetKey: "id"
 });
+Participants.belongsTo(Posts, {
+  foreignKey: "post_id",
+  targetKey: "id"
+});
+Participants.belongsTo(Users, {
+  foreignKey: "user_id",
+  targetKey: "id"
+});
+Chats.belongsTo(Posts, {
+  foreignKey: "post_id",
+  targetKey: "id"
+});
+Chats.belongsTo(Users, {
+  foreignKey: "user_id",
+  targetKey: "id"
+});
+Spots.belongsTo(Locations, {
+  foreignKey: "location_id",
+  targetKey: "id"
+})
+Spots.hasMany(Posts, {
+  foreignKey: "spot_id",
+  sourceKey: "id"
+})
+Posts.belongsTo(Spots, {
+  foreignKey: "spot_id",
+  targetKey: "id"
+})
 
 export class PostsController {
+  //전체 모임 목록
   public getRoomList(req: Request, res: Response) {
+    let user_id: number = req.body.info.user_id;
     Posts.findAll<Posts>({
       attributes: ["id", "text", "date"],
       include: [
@@ -47,11 +61,16 @@ export class PostsController {
           model: Users,
           required: true,
           attributes: ["id", "name"]
+        },
+        {
+          model: Spots,
+          required: true,
+          attributes: ["name"]
         }
       ]
     })
       .then((datas: any) => {
-        let result = [];
+        let result: any[] = [];
         for (let i = 0; i < datas.length; i++) {
           result.push({
             id: datas[i].id,
@@ -59,10 +78,30 @@ export class PostsController {
             host_name: datas[i].User.name,
             location_name: datas[i].Location.name,
             date: datas[i].date,
-            text: datas[i].text
+            text: datas[i].text,
+            spot_name: datas[i].Spot.name
           });
         }
-        res.status(200).send(result);
+        Participants.findAll<Participants>({ attributes: ["post_id"], where: { user_id } })
+          .then((data: any) => {
+            let ids: number[] = data.map((item: any) => item.post_id);
+            if (ids.length === 0) {
+              result.forEach(item => { item.participate = false; });
+              return res.status(200).send(result)
+            } else {
+              result.forEach(item => {
+                if (ids.indexOf(item.id) !== -1) {
+                  item.participate = true;
+                } else {
+                  item.participate = false;
+                }
+              })
+              return res.status(200).send(result)
+            }
+          })
+          .catch((err: Error) => {
+            res.status(500).send("db쪽 문제 Participants")
+          })
       })
       .catch((err: Error) => {
         res.status(500).send({
@@ -73,7 +112,7 @@ export class PostsController {
         });
       });
   }
-
+  //나의 모입 목록
   public getMyList(req: Request, res: Response) {
     Participants.findAll<Participants>({
       attributes: ["post_id", "user_id"],
@@ -82,7 +121,7 @@ export class PostsController {
           model: Posts,
           required: true,
           attributes: ["date"],
-          include: [{ model: Locations, required: true, attributes: ["name"] }]
+          include: [{ model: Locations, required: true, attributes: ["name"] }, { model: Spots, required: true, attributes: ["name"] }]
         },
         {
           model: Users,
@@ -102,7 +141,8 @@ export class PostsController {
             host_id: datas[i].user_id,
             host_name: datas[i].User.name,
             location_name: datas[i].Post.Location.name,
-            date: datas[i].Post.date
+            date: datas[i].Post.date,
+            spot_name: datas[i].Post.Spot.name
           };
           newdatas.push(dataElement);
         }
@@ -117,67 +157,69 @@ export class PostsController {
         });
       });
   }
-
+  //방 만들기 및 같이가자에 추가
   public makeRoomOrAddMyList(req: Request, res: Response) {
-    // if (!req.query.user_id) {
-    //   const params: PostsInterface = req.body;
-    //   Posts.create<Posts>(params).then((datas: Posts) => {
-    //     res.status(201).json(datas); // redirect("/room")문제있음. 프런트와 이야기 해야 함.
-    //   });
-    // } else {
-    //   const params: ParticipantsInterface = {
-    //     user_id: req.query.user_id,
-    //     post_id: req.query.room_id
-    //   };
-    //   Participants.create<Participants>(params).then((datas: Participants) => {
-    //     res.status(201).json(datas);
-    //   });
-    // }
     let array: string[] = Object.keys(req.body);
     if (
       array.indexOf("location") === -1 ||
       array.indexOf("date") === -1 ||
-      array.indexOf("text") === -1
+      array.indexOf("text") === -1 ||
+      array.indexOf("spot") === -1
     ) {
       return res.status(400).send({
         error: {
           status: 400,
-          message: "body를 다음과 같이 수정해주세요,{location, date, text}"
+          message: "body를 다음과 같이 수정해주세요,{location, date, text. spot}"
         }
       });
     }
     let name: string = req.body.location;
     let date: string = req.body.date;
     let text: string = req.body.text;
-    let host_id: number = +req.body.info.user_id;
-    Locations.findOne<Locations>({
-      where: { name }
-    })
-      .then((data1: any) => {
-        let post: PostsInterface = {
-          host_id,
-          text,
-          date,
-          location_id: data1.id
-        };
-        Posts.create<Posts>(post)
-          .then((data2: Posts) => {
-            Participants.create<Participants>({
-              user_id: host_id,
-              post_id: data2.id
-            })
-              .then((a: any) => {
-                Users.findOne<Users>({
-                  where: { id: data2.host_id }
+    let spot: string = req.body.spot;
+    let host_id: number = req.body.info.user_id;
+    Spots.findOne<Spots>({ where: { name: spot } })
+      .then((data: any) => {
+        Locations.findOne<Locations>({
+          where: { name }
+        })
+          .then((data1: any) => {
+            let post: PostsInterface = {
+              host_id,
+              text,
+              date,
+              location_id: data1.id,
+              spot_id: data.id
+            };
+            Posts.create<Posts>(post)
+              .then((data2) => {
+                Participants.create<Participants>({
+                  user_id: host_id,
+                  post_id: data2.id
                 })
-                  .then((data3: any) => {
-                    let data = {
-                      host_name: data3.name,
-                      location: name,
-                      date: data2.date,
-                      text: data2.text
-                    };
-                    res.status(201).send(data);
+                  .then(() => {
+                    // Users.findOne<Users>({
+                    //   where: { id: host_id }
+                    // })
+                    //   .then((data3: any) => {
+                    //     let data = {
+                    //       post_id: data2.id,
+                    //       host_name: data3.name,
+                    //       location: name,
+                    //       spot,
+                    //       date,
+                    //       text
+                    //     };
+                    res.status(201).send({ post_id: data2.id });
+                    //   })
+                    //   .catch((err: Error) => {
+                    //   res.status(500).send({
+                    //     error: {
+                    //       status: 500,
+                    //       message: "모임 생성 실패"
+                    //     }
+                    //   });
+                    // });
                   })
                   .catch((err: Error) => {
                     res.status(500).send({
@@ -189,17 +231,19 @@ export class PostsController {
                   });
               })
               .catch((err: Error) => {
-                res.status(500).send("db쪽 문제 Posts");
+                res.status(500).send("db쪽 문제 Participants");
               });
           })
           .catch((err: Error) => {
-            res.status(500).send("db쪽 문제 Participants");
+            res.status(500).send("db쪽 문제 Posts");
           });
       })
       .catch((err: Error) => {
-        res.status(500).send("db쪽 문제 Posts");
-      });
+        res.status(500).send("db쪽 에러 Spots")
+      })
+
   }
+  //룸 내용 불어오기
   public getRoomInfo(req: Request, res: Response) {
     if (!("post_id" in req.query)) {
       return res.status(400).send({
@@ -211,7 +255,7 @@ export class PostsController {
     }
     let post_id: number = req.query.post_id;
     Posts.findOne<Posts>({
-      attributes: ["host_id", "date", "text", "pay"],
+      attributes: ["host_id", "date", "text", "pay", "createdAt"],
       include: [
         {
           model: Locations,
@@ -220,6 +264,11 @@ export class PostsController {
         },
         {
           model: Users,
+          required: true,
+          attributes: ["name"]
+        },
+        {
+          model: Spots,
           required: true,
           attributes: ["name"]
         }
@@ -239,7 +288,7 @@ export class PostsController {
           where: { post_id }
         })
           .then((datas2: any) => {
-            let arr = [];
+            let arr: string[] = [];
             for (let i = 0; i < datas2.length; i++) {
               arr.push(datas2[i].User.name);
             }
@@ -251,6 +300,8 @@ export class PostsController {
               date: datas1.date,
               text: datas1.text,
               pay: datas1.pay,
+              createdAt: datas1.createdAt,
+              spot_name: datas1.Spot.name,
               participants: arr
             };
             res.status(200).send(result);
@@ -278,21 +329,31 @@ export class PostsController {
         }
       });
     }
-    const post_id: number = req.body.post_id;
+    let post_id: number = req.body.post_id;
     let user_id: number = req.body.info.user_id;
-    let data: ParticipantsInterface = { post_id, user_id };
-    Participants.create<Participants>(data)
-      .then(() => {
-        return res.status(200).send({ message: "성공적으로 등록되었습니다." });
+    Participants.findOne<Participants>({ where: { post_id, user_id } })
+      .then((data: any) => {
+        if (data) {
+          return res.send("이미 참가하였습니다")
+        } else {
+          let data1: ParticipantsInterface = { post_id, user_id };
+          Participants.create<Participants>(data1)
+            .then(() => {
+              return res.status(200).send({ message: "성공적으로 등록되었습니다." });
+            })
+            .catch((err: Error) => {
+              return res.status(500).send({
+                error: {
+                  status: 500,
+                  message: "같이가기 실패"
+                }
+              });
+            });
+        }
       })
       .catch((err: Error) => {
-        return res.status(500).send({
-          error: {
-            status: 500,
-            message: "같이가기 실패"
-          }
-        });
-      });
+        return res.status(500).send("db쪽 문제 Participants")
+      })
   }
   //룸에서 나가기
   public deleteFromList(req: Request, res: Response) {
@@ -313,7 +374,6 @@ export class PostsController {
     };
     Participants.destroy(options)
       .then(() => {
-        console.log("제거 성공");
         return res.status(200).send({ message: "성공적으로 제거되었습니다." });
       })
       .catch((err: Error) => {
@@ -324,5 +384,52 @@ export class PostsController {
           }
         });
       });
+  }
+  // 모든 지역
+  getLocationList(req: Request, res: Response) {
+    Locations.findAll<Locations>({})
+      .then((datas: any) => {
+        let arr: string[] = datas.map((item: any) => item.name)
+        res.status(200).send(arr);
+      })
+      .catch((err: Error) => {
+        res.status(500).send({
+          error: {
+            status: 500,
+            message: "데이터 불러오기 실패"
+          }
+        })
+      })
+  }
+  //spot 상세 정보
+  getSpotInfo(req: Request, res: Response) {
+    if (!("location_name" in req.query)) {
+      return res.status(400).send({
+        error: {
+          status: 400,
+          message: "다음과 같이 수정해주세요, location_name=제주"
+        }
+      })
+    }
+    let location_name: string = req.query.location_name;
+    Spots.findAll<Spots>({
+      attributes: ["name", "X", "Y"],
+      include: [{
+        model: Locations,
+        attributes: ["name"],
+        where: {
+          name: location_name
+        }
+      }]
+    })
+      .then((data: any) => {
+        let arr = data.map((item: any) => {
+          return { [item.name]: { X: item.X, Y: item.Y } }
+        })
+        res.status(200).send(arr);
+      })
+      .catch((err: Error) => {
+        res.status(500).send({ message: "db쪽 에러" })
+      })
   }
 }

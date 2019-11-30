@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { Users } from "../models/Users"
-// import { userInterface } from "../models/Users"
+import { Users, UsersInterface } from "../models/Users"
 import jwt from 'jsonwebtoken';
-import { config } from '../config'
+import crypto from "crypto";
+import { config } from '../config';
 
 interface Token {
     user_id: number;
@@ -25,14 +25,6 @@ function tokenSign(user: Token): string {
     }
 }
 
-interface userInterface {
-    name: string;
-    email: string;
-    password?: string;
-    oAuth: number;
-}
-
-
 export class User {
 
     signup(req: Request, res: Response) {
@@ -49,9 +41,10 @@ export class User {
         let name: string = req.body.name;
         let email: string = req.body.email;
         let oAuth: number = +req.body.oAuth;
+        let phone: string = req.body.phone;
         if (oAuth === 0) {
             let password: string = req.body.password;
-            Users.findOne<Users>({ where: { email } })
+            Users.findOne<Users>({ where: { email: email } })
                 .then((user) => {
                     if (user) {
                         return res.status(409).send({
@@ -61,7 +54,10 @@ export class User {
                             }
                         })
                     } else {
-                        let user1: userInterface = { name, email, password, oAuth: 0 };
+                        let hash = crypto.createHmac('sha256', config.secret)
+                            .update(password)
+                            .digest('hex')
+                        let user1: UsersInterface = { name, email, password: hash, oAuth: 0, phone };
                         Users.create<Users>(user1)
                             .then(() => {
                                 return res.status(201).send({ message: "회원가입 성공" });
@@ -70,7 +66,7 @@ export class User {
                                 return res.status(500).send({
                                     error: {
                                         status: 500,
-                                        message: "회원가입 실패"
+                                        message: "회원가입 실패 2"
                                     }
                                 })
                             })
@@ -80,7 +76,7 @@ export class User {
                     return res.status(500).send({
                         error: {
                             status: 500,
-                            message: "회원가입 실패"
+                            message: "회원가입 실패 1"
                         }
                     })
                 })
@@ -101,7 +97,10 @@ export class User {
         }
         let email: string = req.body.email;
         let password: string = req.body.password;
-        Users.findOne<Users>({ where: { email, password } })
+        let hash = crypto.createHmac('sha256', config.secret)
+            .update(password)
+            .digest('hex')
+        Users.findOne<Users>({ where: { email, password: hash } })
             .then((user) => {
                 if (user) {
                     let user_id: number = +user.id;
@@ -128,11 +127,11 @@ export class User {
     userPut(req: Request, res: Response) {
         let arr: string[] = Object.keys(req.body);
         if ((arr.indexOf('name') === -1) || (arr.indexOf('password') === -1) ||
-            (arr.indexOf('image') === -1) || (arr.indexOf('email') === -1)) {
+            (arr.indexOf('image') === -1)) {
             return res.status(400).send({
                 error: {
                     status: 400,
-                    message: "body를 다음과 같이 수정해주세요,{ name, password, image, email }"
+                    message: "body를 다음과 같이 수정해주세요,{ name, password, image }"
                 }
             })
         }
@@ -164,9 +163,15 @@ export class User {
                 let name2: string = (<Users>user).name;
                 let password2: string | undefined = (<Users>user).password;
                 let image2: Blob | undefined = (<Users>user).image;
+                if (password1.trim().length !== 0 && password1) {
+                    password1 = crypto.createHmac('sha256', config.secret)
+                        .update(password1)
+                        .digest('hex')
+                }
                 name2 = name1 || name2;
                 password2 = password1 || password2;
                 image2 = image1 || image2;
+
                 Users.update<Users>({ name: name2, password: password2, image: image2 }, { where: { email } })
                     .then(() => {
                         return res.status(200).send({ message: "회원정보 수정완료" })
@@ -214,6 +219,9 @@ export class User {
                 message: "등록 상태가 아닙니다."
             })
         }
+    }
+    check(req: Request, res: Response) {
+        res.send("url 확인 부탁드립니다")
     }
 }
 

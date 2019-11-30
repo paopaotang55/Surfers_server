@@ -2,6 +2,9 @@ import express from "express";
 import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
+// import * as schedule from "node-schedule";
+const schedule = require('node-schedule');
+import Default from "./controller/Default"
 
 import { PostsRoutes } from "./routes/Post";
 import { DefaultRoutes } from "./routes/Default";
@@ -69,6 +72,10 @@ class App {
     this.app.use(cors());
   }
 }
+schedule.scheduleJob('0 0 0 * * *', function () {
+  console.log('echo:' + new Date());
+  Default.deleteData();
+});
 
 const server = new App();
 

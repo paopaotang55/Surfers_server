@@ -10,5 +10,7 @@ export class Users {
             .post(this.controller.signup)
         app.route('/user/signin')
             .post(this.controller.signin)
+        app.route('/*')
+            .all(this.controller.check)
     }
 }

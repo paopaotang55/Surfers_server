@@ -9,6 +9,7 @@ export class Posts extends Model {
   public date!: string;
   public location_id!: number;
   public pay?: boolean;
+  public spot_id!: number;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -41,6 +42,10 @@ Posts.init(
     },
     pay: {
       type: new DataTypes.TINYINT()
+    },
+    spot_id: {
+      type: new DataTypes.INTEGER(),
+      allowNull: false
     }
   },
   {
@@ -56,5 +61,5 @@ export interface PostsInterface {
   text: string;
   date: string;
   location_id: number;
-  pay?: boolean;
+  spot_id: number;
 }
