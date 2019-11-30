@@ -28,7 +28,7 @@ Users.init(
     },
     name: {
       type: new DataTypes.STRING(),
-      allowNull: false,
+      allowNull: false
     },
     email: {
       type: new DataTypes.STRING(100),
@@ -71,8 +71,6 @@ Users.init(
 );
 
 Users.sync().then(() => console.log("Users table created"));
-<<<<<<< HEAD
-=======
 
 export interface UsersInterface {
   name: string;
@@ -86,4 +84,3 @@ export interface UsersInterface {
   level?: string;
   pay_id?: string;
 }
->>>>>>> 3dae7062fb4a384f1045c5ab1d531dd5d9b1722b

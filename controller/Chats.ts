@@ -2,16 +2,11 @@ import { Request, Response } from "express";
 import { Chats, ChatsInterface } from "../models/Chats";
 import { Users } from "../models/Users";
 
-
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
 
-<<<<<<< HEAD
 Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
 Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
-=======
-// Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
->>>>>>> 3dae7062fb4a384f1045c5ab1d531dd5d9b1722b
 export class ChatsController {
   public getChats(req: Request, res: Response) {
     //   Chats.findAll<Chats>({ where: { post_id: req.query.post_id } }).then(
@@ -43,7 +38,7 @@ export class ChatsController {
           status: 400,
           message: "다음과 같이 수정해주세요, post_id=1"
         }
-      })
+      });
     }
     let post_id: number = req.query.post_id;
     Chats.findAll<Chats>({

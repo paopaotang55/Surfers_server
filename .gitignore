@@ -10,13 +10,6 @@ js
 package-lock.json
 package.json
 config
-<<<<<<< HEAD
 yarn.lock
 yarn-error.log
 
-=======
-database
-database.ts
-./js
-js
->>>>>>> 3dae7062fb4a384f1045c5ab1d531dd5d9b1722b
