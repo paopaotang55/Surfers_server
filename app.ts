@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
 // import * as schedule from "node-schedule";
-const schedule = require('node-schedule');
-import Default from "./controller/Default"
+const schedule = require("node-schedule");
+import Default from "./controller/Default";
 
 import { PostsRoutes } from "./routes/Post";
 import { DefaultRoutes } from "./routes/Default";
@@ -13,6 +13,9 @@ import { ChatRoutes } from "./routes/Chat";
 import { Chats, ChatsInterface } from "./models/Chats";
 import { Users } from "./routes/User";
 import { ChatDBInterface } from "./controller/JsonInterfaces";
+
+import { ChatsController } from "./controller/Chats";
+import { sendPushTokensToExpo } from "./controller/PushNoti";
 
 class App {
   public app: express.Application;
@@ -24,6 +27,7 @@ class App {
   public test: any;
   public chats: any;
   public routeUser: Users = new Users();
+  public chatsController: ChatsController = new ChatsController();
 
   constructor() {
     this.app = express().bind(this);
@@ -42,10 +46,11 @@ class App {
         console.log("socket rooms: ", Object.keys(socket.rooms));
       });
 
-      socket.on("message", (data: any) => {
+      socket.on("message", async (data: any) => {
         //in this data we will have message datas and room
 
-        console.log("message data:", data);
+        // console.log("message data:", data);
+        //this part is just for ordinary chat room built by using socket.io
         const { post_id } = data;
         const dbObj: ChatDBInterface = {
           user_id: data.user._id,
@@ -72,8 +77,8 @@ class App {
     this.app.use(cors());
   }
 }
-schedule.scheduleJob('0 0 0 * * *', function () {
-  console.log('echo:' + new Date());
+schedule.scheduleJob("0 0 0 * * *", function() {
+  console.log("echo:" + new Date());
   Default.deleteData();
 });
 

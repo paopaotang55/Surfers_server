@@ -1,6 +1,6 @@
 import server from "./app";
 
-const Port = 4000;
+const Port = 3000;
 
 server.http.listen(Port, (err: Error) => {
   if (err) {

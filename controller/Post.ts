@@ -35,15 +35,15 @@ Chats.belongsTo(Users, {
 Spots.belongsTo(Locations, {
   foreignKey: "location_id",
   targetKey: "id"
-})
+});
 Spots.hasMany(Posts, {
   foreignKey: "spot_id",
   sourceKey: "id"
-})
+});
 Posts.belongsTo(Spots, {
   foreignKey: "spot_id",
   targetKey: "id"
-})
+});
 
 export class PostsController {
   //전체 모임 목록
@@ -460,4 +460,3 @@ export class PostsController {
 //   { location_id: 1, name: '금진', X: 95, Y: 129 },
 //   { location_id: 1, name: '용화', X: 99, Y: 124 },
 // ])
-
