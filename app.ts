@@ -60,13 +60,6 @@ class App {
         Chats.create<Chats>(dbObj);
         socket.to(post_id).emit("message", data);
         console.log(`message event got message ${data} in room ${post_id}`);
-
-        //this part is only for push_noti.
-        //1st step, get all push_token of all of users in this room, naturally except message sender.
-        let pushTokens = await this.chatsController.get_pushTokensInTheRoom(
-          post_id
-        );
-        // await sendPushTokensToExpo();
       });
     });
 

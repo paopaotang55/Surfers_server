@@ -230,10 +230,8 @@ export class User {
       return res.send("token 없음");
     }
     try {
-      let token1: string = bearerToken.split(" ")[1];
-      console.log(token1);
-      if (tokenVerify(token1)) {
-        req.body.info = jwt.verify(token1, config.secret);
+      if (tokenVerify(bearerToken)) {
+        req.body.info = jwt.verify(bearerToken, config.secret);
         console.log(req);
         next();
       } else {
@@ -252,13 +250,15 @@ export class User {
   }
   tokenCheck(req: Request, res: Response) {
     let bearerToken: string | undefined = req.headers.authorization;
+    console.log("bearerToken: ", bearerToken);
     if (!bearerToken) {
       return res.send("token 없음");
     }
-    let token1: string = bearerToken.split(" ")[1];
-    if (tokenVerify(token1)) {
+    if (tokenVerify(bearerToken)) {
+      console.log("tokencheck true");
       return res.status(200).send({ message: true });
     } else {
+      console.log("tokencheck false");
       return res.status(400).send({ message: false });
     }
   }
@@ -312,5 +312,13 @@ export class User {
   }
   check(req: Request, res: Response) {
     res.send("url 확인 부탁드립니다");
+  }
+
+  test(req: Request, res: Response) {
+    let authorization: any = req.headers.authorization;
+    console.log("usertoken: ", authorization);
+    let decoded = jwt.decode(authorization, { complete: true });
+    console.log("decoded token: ", decoded);
+    res.status(200).send({ message: decoded });
   }
 }

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { Chats, ChatsInterface } from "../models/Chats";
 import { Users } from "../models/Users";
+import { database } from "../database/database";
+import { sendPushTokensToExpo } from "./PushNoti";
 
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
@@ -61,7 +63,7 @@ export class ChatsController {
             text: data[i].text,
             createdAt: data[i].createdAt,
             user: {
-              _id: data[i].id,
+              _id: data[i].User.id,
               name: data[i].User.name,
               avatar: data[i].User.img_url
             }
@@ -80,6 +82,8 @@ export class ChatsController {
   }
 
   public async post_pushToken(req: Request, res: Response) {
+    console.log("post_pushToken");
+    console.log("req Body: ", req.body);
     await Users.update<Users>(
       { push_token: req.body.push_token },
       { where: { email: req.body.email } }
@@ -89,10 +93,25 @@ export class ChatsController {
     await res.status(200).send({ message: "push_token 저장 완료" });
   }
 
-  public async get_pushTokensInTheRoom(post_id: number) {
-    await Chats.findAll<Chats>({
+  public async GetNSendPushTokens(post_id: number) {
+    let dataChunk = await Chats.findAll<any>({
       include: [{ model: Users, attributes: ["push_token"] }],
       where: { post_id: post_id }
-    }).then(res => res);
+    });
+
+    let newdataChunk = [];
+    for (let i = 0; i < dataChunk.length; i++) {
+      newdataChunk.push(dataChunk[i].dataValues);
+      newdataChunk[i].push_token = newdataChunk[i].User.dataValues.push_token;
+    }
+
+    let pushTokenArray: any = [];
+    for (let i = 0; i < newdataChunk.length; i++) {
+      if (!pushTokenArray.includes(newdataChunk[i].push_token))
+        pushTokenArray.push(newdataChunk[i].push_token);
+    }
+    console.log("pushTokenArray: ", pushTokenArray);
+
+    await sendPushTokensToExpo(pushTokenArray);
   }
 }
