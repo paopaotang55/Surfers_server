@@ -1,47 +1,53 @@
-import Expo, { ExpoPushMessage, ExpoPushReceipt } from "expo-server-sdk";
+import Expo, {
+  ExpoPushMessage,
+  ExpoPushReceipt,
+  ExpoPushToken
+} from "expo-server-sdk";
 
-//새로운 Expo sdk 클라이언트를 만든다.
-let expo = new Expo();
-//expo 서버를 거쳐 클라이언트에게 배분하고 싶은 메세지들.
-let messages: ExpoPushMessage[] = [];
+export async function sendPushTokensToExpo(somePushTokens: ExpoPushToken[]) {
+  //새로운 Expo sdk 클라이언트를 만든다.
+  let expo = new Expo();
+  //expo 서버를 거쳐 클라이언트에게 배분하고 싶은 메세지들.
+  let messages: ExpoPushMessage[] = [];
 
-//somePushTokens들은 같은 챗방에 있는 모든 유저들의 pushTokens. 데이터베이스에서 검색해 와야 한다.
-let somePushTokens: any[] = []; //db에서 긁어오는 함수 만들기
-for (let pushToken of somePushTokens) {
-  //각각의 푸쉬토큰은 ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]처럼 보인다.
+  //somePushTokens들은 같은 챗방에 있는 모든 유저들의 pushTokens. 데이터베이스에서 검색해 와야 한다.
 
-  // 모든 푸쉬토큰들이 엑스포푸쉬토큰으로 유효한지 체크.
-  if (!Expo.isExpoPushToken(pushToken)) {
-    console.error(`Push token ${pushToken} is not a valid Expo push token`);
-    continue;
-  }
+  for (let pushToken of somePushTokens) {
+    //각각의 푸쉬토큰은 ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]처럼 보인다.
 
-  //유효하면 메세지 배열에 해당 데이터를 추가함.
-  messages.push({
-    to: pushToken,
-    sound: "default",
-    body: "This is a test notification", //알람창에 띄울 메세지.
-    data: { withSome: "data" }
-  });
-}
-
-//메세지들은 한꺼번에 보내기 위해,
-let chunks = expo.chunkPushNotifications(messages);
-let tickets: ExpoPushReceipt[] = [];
-(async () => {
-  // Send the chunks to the Expo push notification service. There are
-  // different strategies you could use. A simple one is to send one chunk at a
-  // time, which nicely spreads the load out over time:
-  for (let chunk of chunks) {
-    try {
-      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-      console.log(ticketChunk);
-      tickets.push(...ticketChunk);
-    } catch (error) {
-      console.error(error);
+    // 모든 푸쉬토큰들이 엑스포푸쉬토큰으로 유효한지 체크.
+    if (!Expo.isExpoPushToken(pushToken)) {
+      console.error(`Push token ${pushToken} is not a valid Expo push token`);
+      continue;
     }
+
+    //유효하면 메세지 배열에 해당 데이터를 추가함.
+    messages.push({
+      to: pushToken,
+      sound: "default",
+      body: "This is a test notification", //알람창에 띄울 메세지.
+      data: { withSome: "data" }
+    });
   }
-})();
+
+  //메세지들은 한꺼번에 보내기 위해,
+  let chunks = expo.chunkPushNotifications(messages);
+  let tickets: ExpoPushReceipt[] = [];
+  (async () => {
+    // Send the chunks to the Expo push notification service. There are
+    // different strategies you could use. A simple one is to send one chunk at a
+    // time, which nicely spreads the load out over time:
+    for (let chunk of chunks) {
+      try {
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        console.log(ticketChunk);
+        tickets.push(...ticketChunk);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+}
 
 //expo가 푸쉬알림 서비스를 애플 혹은 구글에게 전달 해 준 이후에, 각각의 알림에 대한 receipt영수증이 생성된다.
 //이 영수증들은 최소 하루이상 보관되며, 오래된 영수증들은 삭제된다.

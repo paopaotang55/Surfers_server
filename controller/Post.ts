@@ -8,42 +8,42 @@ import { Users } from "../models/Users";
 import { Chats } from "../models/Chats";
 import { Spots } from "../models/Spots";
 
-// Posts.belongsTo(Locations, {
-//   foreignKey: "location_id",
-//   targetKey: "id"
-// });
-// Posts.belongsTo(Users, {
-//   foreignKey: "host_id",
-//   targetKey: "id"
-// });
-// Participants.belongsTo(Posts, {
-//   foreignKey: "post_id",
-//   targetKey: "id"
-// });
-// Participants.belongsTo(Users, {
-//   foreignKey: "user_id",
-//   targetKey: "id"
-// });
-// Chats.belongsTo(Posts, {
-//   foreignKey: "post_id",
-//   targetKey: "id"
-// });
-// Chats.belongsTo(Users, {
-//   foreignKey: "user_id",
-//   targetKey: "id"
-// });
-// Spots.belongsTo(Locations, {
-//   foreignKey: "location_id",
-//   targetKey: "id"
-// })
-// Spots.hasMany(Posts, {
-//   foreignKey: "spot_id",
-//   sourceKey: "id"
-// })
-// Posts.belongsTo(Spots, {
-//   foreignKey: "spot_id",
-//   targetKey: "id"
-// })
+Posts.belongsTo(Locations, {
+  foreignKey: "location_id",
+  targetKey: "id"
+});
+Posts.belongsTo(Users, {
+  foreignKey: "host_id",
+  targetKey: "id"
+});
+Participants.belongsTo(Posts, {
+  foreignKey: "post_id",
+  targetKey: "id"
+});
+Participants.belongsTo(Users, {
+  foreignKey: "user_id",
+  targetKey: "id"
+});
+Chats.belongsTo(Posts, {
+  foreignKey: "post_id",
+  targetKey: "id"
+});
+Chats.belongsTo(Users, {
+  foreignKey: "user_id",
+  targetKey: "id"
+});
+Spots.belongsTo(Locations, {
+  foreignKey: "location_id",
+  targetKey: "id"
+});
+Spots.hasMany(Posts, {
+  foreignKey: "spot_id",
+  sourceKey: "id"
+});
+Posts.belongsTo(Spots, {
+  foreignKey: "spot_id",
+  targetKey: "id"
+});
 
 export class PostsController {
   //전체 모임 목록
@@ -337,7 +337,7 @@ export class PostsController {
         }
       });
     }
-    let post_id: number = req.body.post_id;
+    let post_id: number = +req.body.post_id;
     let user_id: number = req.body.info.user_id;
     Participants.findOne<Participants>({ where: { post_id, user_id } })
       .then((data: any) => {
@@ -436,7 +436,7 @@ export class PostsController {
     })
       .then((data: any) => {
         let arr = data.map((item: any) => {
-          return { [item.name]: { X: item.X, Y: item.Y } };
+          return { [item.name]: { x: item.X, y: item.Y } };
         });
         res.status(200).send(arr);
       })
@@ -445,3 +445,18 @@ export class PostsController {
       });
   }
 }
+// Spots.bulkCreate([
+//   { location_id: 1, name: '천진', X: 87, Y: 142 },
+//   { location_id: 1, name: '송지호', X: 86, Y: 144 },
+//   { location_id: 1, name: '속초', X: 87, Y: 141 },
+//   { location_id: 1, name: '설악', X: 87, Y: 140 },
+//   { location_id: 1, name: '기사문', X: 89, Y: 137 },
+//   { location_id: 1, name: '동산', X: 90, Y: 136 },
+//   { location_id: 1, name: '죽도', X: 90, Y: 136 },
+//   { location_id: 1, name: '인구', X: 90, Y: 136 },
+//   { location_id: 1, name: '갯마을', X: 90, Y: 136 },
+//   { location_id: 1, name: '남애3리', X: 90, Y: 136 },
+//   { location_id: 1, name: '사천', X: 92, Y: 133 },
+//   { location_id: 1, name: '금진', X: 95, Y: 129 },
+//   { location_id: 1, name: '용화', X: 99, Y: 124 },
+// ])

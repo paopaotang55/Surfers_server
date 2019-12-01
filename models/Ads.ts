@@ -18,11 +18,11 @@ Ads.init(
       primaryKey: true
     },
     image: {
-      type: new DataTypes.BLOB(),
+      type: new DataTypes.BLOB()
     },
     url: {
       type: new DataTypes.STRING(),
-      allowNull: false,
+      allowNull: false
     }
   },
   {

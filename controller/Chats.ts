@@ -83,7 +83,16 @@ export class ChatsController {
     await Users.update<Users>(
       { push_token: req.body.push_token },
       { where: { email: req.body.email } }
-    );
+    ).catch((err: Error) => {
+      res.status(500).send({ message: "서버 에러" });
+    });
     await res.status(200).send({ message: "push_token 저장 완료" });
+  }
+
+  public async get_pushTokensInTheRoom(post_id: number) {
+    await Chats.findAll<Chats>({
+      include: [{ model: Users, attributes: ["push_token"] }],
+      where: { post_id: post_id }
+    }).then(res => res);
   }
 }

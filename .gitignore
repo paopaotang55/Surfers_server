@@ -5,7 +5,7 @@ node_modules
 database
 config
 js
-
+index.ts
 ## json.files##
 package-lock.json
 package.json
