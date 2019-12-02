@@ -34,7 +34,7 @@ export async function sendPushTokensToExpo(somePushTokens: ExpoPushToken[]) {
 
   //메세지들은 한꺼번에 보내기 위해,
   let chunks = expo.chunkPushNotifications(messages);
-  let tickets: ExpoPushTicket[] = [];
+  let tickets: any = [];
   (async () => {
     // Send the chunks to the Expo push notification service. There are
     // different strategies you could use. A simple one is to send one chunk at a
@@ -59,7 +59,7 @@ export async function sendPushTokensToExpo(somePushTokens: ExpoPushToken[]) {
   //영수증은 가끔 반드시 해결해야 할 에러코드를 포함한다. 특히 애플이나 구글이 알림이 차단되었거나 앱이 삭제된 디바이스에 알림을 보내는 앱들을 차단 할 수 있다.
   //expo는 이와 관련해서는 어떠한 조정을 하지 않으며, 애플이나 구글에 피드백을 보내지도 않는다. 그러니 알아서 잘~해라.
 
-  let receiptIds: ExpoPushReceiptId[] = [];
+  let receiptIds: any = [];
   for (let ticket of tickets) {
     // 모든 티켓들이 ID를 가지는건 아님. 예를 들자면, 큐에 더해질 수 없는 티켓들은 ID대신 error코드를 갖고 있을 것이다.
     if (ticket.id) {
