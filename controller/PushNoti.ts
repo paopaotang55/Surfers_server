@@ -27,7 +27,7 @@ export async function sendPushTokensToExpo(somePushTokens: ExpoPushToken[]) {
     messages.push({
       to: pushToken,
       sound: "default",
-      body: "This is a test notification", //알람창에 띄울 메세지.
+      body: "메세지가 도착했습니다.", //알람창에 띄울 메세지.
       data: { withSome: "data" }
     });
   }
