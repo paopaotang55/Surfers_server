@@ -51,6 +51,7 @@ export class User {
     let email: string = req.body.email;
     let oAuth: number = +req.body.oAuth;
     let phone: string = req.body.phone;
+    let img_url: string = req.body.img_url;
     if (oAuth === 0) {
       console.log("oAuth = 0");
       console.log("email: ", email);
@@ -74,7 +75,8 @@ export class User {
               email,
               password: hash,
               oAuth: 0,
-              phone
+              phone,
+              img_url
             };
             Users.create<Users>(user1)
               .then(() => {
@@ -314,11 +316,21 @@ export class User {
     res.send("url 확인 부탁드립니다");
   }
 
-  test(req: Request, res: Response) {
+  async identifyUser(req: Request, res: Response) {
     let authorization: any = req.headers.authorization;
     console.log("usertoken: ", authorization);
-    let decoded = jwt.decode(authorization, { complete: true });
-    console.log("decoded token: ", decoded);
-    res.status(200).send({ message: decoded });
+    let decoded: any = jwt.decode(authorization, { complete: true });
+    let user_id = decoded.payload.user_id;
+
+    let user_info: any = await Users.findOne({ where: { id: user_id } });
+
+    let data = {
+      id: user_info.id,
+      email: user_info.email,
+      img_url: user_info.img_url,
+      name: user_info.name
+    };
+
+    await res.status(200).send(data);
   }
 }
