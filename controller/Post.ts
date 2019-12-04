@@ -8,42 +8,42 @@ import { Users } from "../models/Users";
 import { Chats } from "../models/Chats";
 import { Spots } from "../models/Spots";
 
-Posts.belongsTo(Locations, {
-  foreignKey: "location_id",
-  targetKey: "id"
-});
-Posts.belongsTo(Users, {
-  foreignKey: "host_id",
-  targetKey: "id"
-});
-Participants.belongsTo(Posts, {
-  foreignKey: "post_id",
-  targetKey: "id"
-});
-Participants.belongsTo(Users, {
-  foreignKey: "user_id",
-  targetKey: "id"
-});
-Chats.belongsTo(Posts, {
-  foreignKey: "post_id",
-  targetKey: "id"
-});
-Chats.belongsTo(Users, {
-  foreignKey: "user_id",
-  targetKey: "id"
-});
-Spots.belongsTo(Locations, {
-  foreignKey: "location_id",
-  targetKey: "id"
-});
-Spots.hasMany(Posts, {
-  foreignKey: "spot_id",
-  sourceKey: "id"
-});
-Posts.belongsTo(Spots, {
-  foreignKey: "spot_id",
-  targetKey: "id"
-});
+// Posts.belongsTo(Locations, {
+//   foreignKey: "location_id",
+//   targetKey: "id"
+// });
+// Posts.belongsTo(Users, {
+//   foreignKey: "host_id",
+//   targetKey: "id"
+// });
+// Participants.belongsTo(Posts, {
+//   foreignKey: "post_id",
+//   targetKey: "id"
+// });
+// Participants.belongsTo(Users, {
+//   foreignKey: "user_id",
+//   targetKey: "id"
+// });
+// Chats.belongsTo(Posts, {
+//   foreignKey: "post_id",
+//   targetKey: "id"
+// });
+// Chats.belongsTo(Users, {
+//   foreignKey: "user_id",
+//   targetKey: "id"
+// });
+// Spots.belongsTo(Locations, {
+//   foreignKey: "location_id",
+//   targetKey: "id"
+// });
+// Spots.hasMany(Posts, {
+//   foreignKey: "spot_id",
+//   sourceKey: "id"
+// });
+// Posts.belongsTo(Spots, {
+//   foreignKey: "spot_id",
+//   targetKey: "id"
+// });
 
 export class PostsController {
   //전체 모임 목록
