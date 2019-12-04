@@ -119,6 +119,7 @@ export class PostsController {
   }
   //나의 모입 목록
   public getMyList(req: Request, res: Response) {
+    console.log("req.body.info.user_id: ", req.body.info);
     Participants.findAll<Participants>({
       attributes: ["post_id", "user_id"],
       include: [
@@ -327,8 +328,9 @@ export class PostsController {
         res.status(500).send("db쪽 문제 Posts");
       });
   }
-  //같이가기
-  public createFromList(req: Request, res: Response) {
+
+  //룸에 참여하기
+  public joinInRoom(req: Request, res: Response) {
     if (!("post_id" in req.body)) {
       return res.status(400).send({
         error: {
@@ -337,8 +339,9 @@ export class PostsController {
         }
       });
     }
-    let post_id: number = +req.body.post_id;
+    let post_id: number = req.body.post_id;
     let user_id: number = req.body.info.user_id;
+
     Participants.findOne<Participants>({ where: { post_id, user_id } })
       .then((data: any) => {
         if (data) {

@@ -31,7 +31,7 @@ export class Users {
     app.route("/userImage").put(upload.single("image"), this.controller.userImage);
     app.route("/user/signup").post(this.controller.signup);
     app.route("/user/signin").post(this.controller.signin);
-    app.route("/test").all(this.controller.test);
+    app.route("/identify").all(this.controller.identifyUser);
     app.route("/*").all(this.controller.check);
   }
 }
