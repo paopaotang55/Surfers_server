@@ -26,6 +26,7 @@ export class PostsRoutes {
     //   .route("/posts") //example = /posts?user_id=15&room_id=20
     //   .delete(this.controller.token, this.postsController.deleteFromList);
 
+
     // 룸 내용 불러오기
     app
       .route("/post")
@@ -45,5 +46,9 @@ export class PostsRoutes {
     app
       .route("/spot")
       .get(this.controller.token, this.postsController.getSpotInfo);
+
+    app.route("/delete").delete(this.controller.token, this.postsController.deleteRoom);
+    app.route("/edit").put(this.controller.token, this.postsController.putRoomInfo);
+
   }
 }
