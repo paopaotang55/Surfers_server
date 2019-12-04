@@ -444,6 +444,153 @@ export class PostsController {
         res.status(500).send({ message: "db쪽 에러" });
       });
   }
+  deleteRoom(req: Request, res: Response) {
+    if (!("post_id" in req.query)) {
+      return res.status(400).send({
+        error: {
+          status: 400,
+          message: "post_id 없음"
+        }
+      })
+    }
+    let post_id: number = +req.query.post_id;
+    Posts.destroy({ where: { id: post_id } })
+      .then(() => {
+        Participants.destroy({ where: { post_id } })
+          .then(() => {
+            Chats.destroy({ where: { post_id } })
+              .then(() => {
+                return res.status(200).send({ message: "성공적으로 삭제되었습니다" })
+              })
+              .catch((err: Error) => {
+                return res.status(500).send(
+                  {
+                    error: {
+                      status: 500,
+                      message: "방 삭제 실패3"
+                    }
+                  }
+                )
+              })
+          })
+          .catch((err: Error) => {
+            return res.status(500).send(
+              {
+                error: {
+                  status: 500,
+                  message: "방 삭제 실패2"
+                }
+              }
+            )
+          })
+      })
+      .catch((err: Error) => {
+        return res.status(500).send(
+          {
+            error: {
+              status: 500,
+              message: "방 삭제 실패1"
+            }
+          }
+        )
+      })
+  }
+  putRoomInfo(req: Request, res: Response) {
+    if (!("post_id" in req.body) || !("text" in req.body)) {
+      return res.status(400).send({
+        error: {
+          status: 400,
+          message: "다음 형식으로 수정 { post_id, text }"
+        }
+      })
+    }
+    let post_id: number = req.body.post_id;
+    let text: string = req.body.text;
+    Posts.update<Posts>({ text }, { where: { id: post_id } })
+      .then(() => {
+        Posts.findOne<Posts>({
+          attributes: ["host_id", "date", "text", "pay", "createdAt"],
+          include: [
+            {
+              model: Locations,
+              required: true,
+              attributes: ["name"]
+            },
+            {
+              model: Users,
+              required: true,
+              attributes: ["name"]
+            },
+            {
+              model: Spots,
+              required: true,
+              attributes: ["name"]
+            }
+          ],
+          where: { id: post_id }
+        })
+          .then((datas1: any) => {
+            Participants.findAll<Participants>({
+              attributes: ["post_id"],
+              include: [
+                {
+                  model: Users,
+                  required: true,
+                  attributes: ["name"]
+                }
+              ],
+              where: { post_id }
+            })
+              .then((datas2: any) => {
+                let arr: string[] = [];
+                for (let i = 0; i < datas2.length; i++) {
+                  arr.push(datas2[i].User.name);
+                }
+                let result: any = {
+                  id: post_id,
+                  host_id: datas1.host_id,
+                  host_name: datas1.User.name,
+                  location_name: datas1.Location.name,
+                  date: datas1.date,
+                  text: datas1.text,
+                  pay: datas1.pay,
+                  createdAt: datas1.createdAt,
+                  spot_name: datas1.Spot.name,
+                  participants: arr
+                };
+                res.status(200).send(result);
+              })
+              .catch((err: Error) => {
+                res.status(500).send({
+                  error: {
+                    status: 500,
+                    message: "방 수정 실패"
+                  }
+                });
+              });
+          })
+          .catch((err: Error) => {
+            return res.status(500).send(
+              {
+                error: {
+                  status: 500,
+                  message: "방 수정 실패"
+                }
+              }
+            )
+          });
+      })
+      .catch((err: Error) => {
+        return res.status(500).send(
+          {
+            error: {
+              status: 500,
+              message: "방 수정 실패"
+            }
+          }
+        )
+      })
+  }
 }
 // Spots.bulkCreate([
 //   { location_id: 1, name: '천진', X: 87, Y: 142 },

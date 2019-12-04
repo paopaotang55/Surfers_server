@@ -7,6 +7,7 @@ import serveStatic from "serve-static";
 import { Participants } from "../models/Paticipants";
 import { Chats } from "../models/Chats";
 import { Posts } from "../models/Posts";
+import { read } from "fs";
 
 interface Token {
   user_id: number;
@@ -104,7 +105,7 @@ export class User {
     }
   }
   signin(req: Request, res: Response) {
-    console.log("signIn");
+
     let array: string[] = Object.keys(req.body);
     if (array.indexOf("email") === -1 || array.indexOf("password") === -1) {
       return res.status(400).send({
@@ -151,56 +152,62 @@ export class User {
     let arr: string[] = Object.keys(req.body);
     if (
       arr.indexOf("name") === -1 ||
-      arr.indexOf("password") === -1 ||
-      arr.indexOf("image") === -1
+      arr.indexOf("currPassword") === -1 ||
+      arr.indexOf("newPassword") === -1
     ) {
       return res.status(400).send({
         error: {
           status: 400,
-          message: "body를 다음과 같이 수정해주세요,{ name, password, image }"
+          message: "body를 다음과 같이 수정해주세요,{ name, currPassword, newPassword }"
         }
       });
     }
     let email: string = req.body.info.email; // api
     let name1: string = req.body.name;
-    let password1: string = req.body.password;
-    let image1: Blob = req.body.image;
-    Users.findOne<Users>({ where: { name: name1 } })
-      .then(name => {
-        if (name) {
+    let currPassword: string = req.body.currPassword;
+    let newPassword: string = req.body.newPassword;
+    if ((!currPassword && !newPassword) && name1) {
+      Users.update<Users>({ name: name1 }, { where: { email } })
+        .then(() => {
+          return res.status(200).send({ message: "회원정보 수정완료" });
+        })
+        .catch((err: Error) => {
+          return res.status(500).send({
+            error: {
+              status: 500,
+              message: "수정 실패"
+            }
+          });
+        })
+      return
+    }
+    Users.findOne<Users>({ where: { email } })
+      .then(user => {
+        let password1 = crypto
+          .createHmac("sha256", config.secret)
+          .update(currPassword)
+          .digest("hex");
+        if ((<Users>user).password !== password1) {
           return res.status(400).send({
             error: {
               status: 409,
-              message: "다른 유저가 사용 중인 이름 입니다."
+              message: "잘못된 비밀번호 입니다"
             }
           });
-        }
-      })
-      .catch((err: Error) => {
-        return res.status(500).send({
-          error: {
-            status: 500,
-            message: "같은 name 찾기 data 오류"
+        } else {
+          if (newPassword.trim().length !== 0 && newPassword) {
+            newPassword = crypto
+              .createHmac("sha256", config.secret)
+              .update(newPassword)
+              .digest("hex");
           }
-        });
-      });
-    Users.findOne<Users>({ where: { email } })
-      .then(user => {
+        }
         let name2: string = (<Users>user).name;
         let password2: string | undefined = (<Users>user).password;
-        let image2: Blob | undefined = (<Users>user).image;
-        if (password1.trim().length !== 0 && password1) {
-          password1 = crypto
-            .createHmac("sha256", config.secret)
-            .update(password1)
-            .digest("hex");
-        }
         name2 = name1 || name2;
-        password2 = password1 || password2;
-        image2 = image1 || image2;
-
+        password2 = newPassword || password2;
         Users.update<Users>(
-          { name: name2, password: password2, image: image2 },
+          { name: name2, password: password2 },
           { where: { email } }
         )
           .then(() => {
@@ -224,6 +231,40 @@ export class User {
         });
       });
   }
+  userImage(req: any, res: Response) {
+    let bearerToken: string | undefined = req.headers.authorization;
+    if (!bearerToken) {
+      return res.send("token 없음");
+    }
+    try {
+      if (tokenVerify(bearerToken)) {
+        req.body.info = jwt.verify(bearerToken, config.secret);
+        Users.update<Users>({ img_url: req.file.location }, { where: { email: req.body.info.email } })
+          .then(() => {
+            res.status(201).send({ message: "이미지 수정 완료" })
+          })
+          .catch((err: Error) => {
+            res.status(500).send({
+              error: {
+                status: 500,
+                message: "이미지 수정 실패"
+              }
+            })
+          })
+      } else {
+        return res.status(401).send({
+          error: {
+            status: 401,
+            message: "로그인 상태가 아닙니다"
+          }
+        });
+      }
+    } catch (err) {
+      return res.status(401).send({
+        message: "로그인 상태가 아닙니다."
+      });
+    }
+  }
   token(req: Request, res: Response, next: any) {
     let bearerToken: string | undefined = req.headers.authorization;
     if (!bearerToken) {
@@ -232,7 +273,7 @@ export class User {
     try {
       if (tokenVerify(bearerToken)) {
         req.body.info = jwt.verify(bearerToken, config.secret);
-        console.log(req);
+        // console.log(req);
         next();
       } else {
         return res.status(401).send({

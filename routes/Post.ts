@@ -29,5 +29,8 @@ export class PostsRoutes {
 
     app.route("/location").get(this.controller.token, this.postsController.getLocationList);
     app.route("/spot").get(this.controller.token, this.postsController.getSpotInfo);
+
+    app.route("/delete").delete(this.controller.token, this.postsController.deleteRoom);
+    app.route("/edit").put(this.controller.token, this.postsController.putRoomInfo);
   }
 }
