@@ -95,6 +95,7 @@ export class ChatsController {
 
   public async GetNSendPushTokens(req: Request, res: Response) {
     let post_id = req.body.post_id;
+    let sender_pushToken = req.headers.push_token;
     let dataChunk = await Chats.findAll<any>({
       include: [{ model: Users, attributes: ["push_token"] }],
       where: { post_id: post_id }
@@ -108,7 +109,10 @@ export class ChatsController {
 
     let pushTokenArray: any = [];
     for (let i = 0; i < newdataChunk.length; i++) {
-      if (!pushTokenArray.includes(newdataChunk[i].push_token))
+      if (
+        !pushTokenArray.includes(newdataChunk[i].push_token) &&
+        newdataChunk[i].push_token !== sender_pushToken
+      )
         pushTokenArray.push(newdataChunk[i].push_token);
     }
     console.log("pushTokenArray: ", pushTokenArray);
