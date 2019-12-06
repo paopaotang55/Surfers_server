@@ -7,8 +7,8 @@ import { sendPushTokensToExpo } from "./PushNoti";
 // Chats.hasMany(Users, { sourceKey: "user_id", foreignKey: "id" });
 //유저의 이름과 사진등을 가져와야 한다.
 
-Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
-Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
+// Chats.belongsTo(Users, { foreignKey: "user_id", targetKey: "id" });
+// Users.hasMany(Chats, { foreignKey: "user_id", sourceKey: "id" });
 export class ChatsController {
   public getChats(req: Request, res: Response) {
     //   Chats.findAll<Chats>({ where: { post_id: req.query.post_id } }).then(
@@ -93,7 +93,9 @@ export class ChatsController {
     await res.status(200).send({ message: "push_token 저장 완료" });
   }
 
-  public async GetNSendPushTokens(post_id: number) {
+  public async GetNSendPushTokens(req: Request, res: Response) {
+    let post_id = req.body.post_id;
+    let sender_pushToken = req.headers.push_token;
     let dataChunk = await Chats.findAll<any>({
       include: [{ model: Users, attributes: ["push_token"] }],
       where: { post_id: post_id }
@@ -107,7 +109,10 @@ export class ChatsController {
 
     let pushTokenArray: any = [];
     for (let i = 0; i < newdataChunk.length; i++) {
-      if (!pushTokenArray.includes(newdataChunk[i].push_token))
+      if (
+        !pushTokenArray.includes(newdataChunk[i].push_token) &&
+        newdataChunk[i].push_token !== sender_pushToken
+      )
         pushTokenArray.push(newdataChunk[i].push_token);
     }
     console.log("pushTokenArray: ", pushTokenArray);
